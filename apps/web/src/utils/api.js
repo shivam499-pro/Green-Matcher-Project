@@ -21,6 +21,13 @@ api.interceptors.request.use(
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
+    // Add language parameter from localStorage
+    const language = localStorage.getItem('green-matchers-language') || 'en';
+    if (config.params) {
+      config.params = { ...config.params, language };
+    } else {
+      config.params = { language };
+    }
     return config;
   },
   (error) => {
