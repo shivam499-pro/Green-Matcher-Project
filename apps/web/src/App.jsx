@@ -10,6 +10,7 @@ import JobDetail from './pages/JobDetail';
 import JobSeekerDashboard from './pages/JobSeekerDashboard';
 import EmployerDashboard from './pages/EmployerDashboard';
 import AdminDashboard from './pages/AdminDashboard';
+import Careers from './pages/Careers';
 
 function App() {
   return (
@@ -54,13 +55,7 @@ function App() {
             <Route path="/admin-dashboard" element={<AdminDashboard />} />
             <Route path="/jobs" element={<Jobs />} />
             <Route path="/jobs/:id" element={<JobDetail />} />
-            <Route path="/careers" element={<div className="flex-1 flex items-center justify-center bg-gray-50">
-              <div className="text-center">
-                <h1 className="text-3xl font-bold text-gray-900 mb-4">Careers</h1>
-                <p className="text-gray-600">Explore green career paths</p>
-                <a href="/" className="text-primary-600 hover:underline">← Back to Home</a>
-              </div>
-            </div>} />
+            <Route path="/careers" element={<Careers />} />
           </Routes>
         </div>
       </BrowserRouter>
