@@ -3,6 +3,12 @@ import { I18nProvider } from './contexts/I18nContext';
 import LanguageToggle from './components/common/LanguageToggle';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import Profile from './pages/Profile';
+import Recommendations from './pages/Recommendations';
+import Jobs from './pages/Jobs';
+import JobDetail from './pages/JobDetail';
+import JobSeekerDashboard from './pages/JobSeekerDashboard';
+import EmployerDashboard from './pages/EmployerDashboard';
 
 function App() {
   return (
@@ -40,13 +46,12 @@ function App() {
             </div>} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
-            <Route path="/jobs" element={<div className="flex-1 flex items-center justify-center bg-gray-50">
-              <div className="text-center">
-                <h1 className="text-3xl font-bold text-gray-900 mb-4">Jobs</h1>
-                <p className="text-gray-600">Browse green job opportunities</p>
-                <a href="/" className="text-primary-600 hover:underline">← Back to Home</a>
-              </div>
-            </div>} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/recommendations" element={<Recommendations />} />
+            <Route path="/dashboard" element={<JobSeekerDashboard />} />
+            <Route path="/employer-dashboard" element={<EmployerDashboard />} />
+            <Route path="/jobs" element={<Jobs />} />
+            <Route path="/jobs/:id" element={<JobDetail />} />
             <Route path="/careers" element={<div className="flex-1 flex items-center justify-center bg-gray-50">
               <div className="text-center">
                 <h1 className="text-3xl font-bold text-gray-900 mb-4">Careers</h1>

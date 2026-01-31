@@ -49,6 +49,16 @@ export const usersAPI = {
   getUserById: (userId) => api.get(`/api/users/${userId}`),
 };
 
+// Alias for Profile page
+export const userAPI = {
+  getProfile: () => api.get('/api/users/me'),
+  updateProfile: (userData) => api.put('/api/users/me', userData),
+  updateSkills: (skills) => api.put('/api/users/me/skills', { skills }),
+  uploadResume: (formData) => api.post('/api/users/me/resume', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  }),
+};
+
 export const jobsAPI = {
   listJobs: (params) => api.get('/api/jobs', { params }),
   getJob: (jobId) => api.get(`/api/jobs/${jobId}`),
@@ -79,6 +89,11 @@ export const analyticsAPI = {
   getSkillPopularity: (params) => api.get('/api/analytics/skill-popularity', { params }),
   getSalaryRanges: (params) => api.get('/api/analytics/salary-ranges', { params }),
   getSDGDistribution: () => api.get('/api/analytics/sdg-distribution'),
+};
+
+export const recommendationsAPI = {
+  getCareerRecommendations: (params) => api.get('/api/users/me/recommendations', { params }),
+  getJobRecommendations: (params) => api.get('/api/users/me/job-recommendations', { params }),
 };
 
 export default api;
