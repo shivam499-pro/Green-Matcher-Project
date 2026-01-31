@@ -31,6 +31,7 @@ class User(Base):
     skills = Column(JSON, nullable=True)  # Array of skill strings
     resume_url = Column(String(500), nullable=True)
     language = Column(String(10), default="en")  # Preferred language
+    saved_jobs = Column(JSON, nullable=True)  # Array of saved job IDs
     
     # Employer specific fields
     company_name = Column(String(255), nullable=True)

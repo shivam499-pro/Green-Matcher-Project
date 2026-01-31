@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useI18n } from '../contexts/I18nContext';
-import { jobsAPI } from '../utils/api';
+import { jobsAPI, savedJobsAPI } from '../utils/api';
 
 const Jobs = () => {
   const { t } = useI18n();
@@ -62,6 +62,17 @@ const Jobs = () => {
       setError(t('jobs.searchError') || 'Failed to search jobs');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleSaveJob = async (jobId) => {
+    try {
+      await savedJobsAPI.saveJob(jobId);
+      setError({ type: 'success', text: t('jobs.saveSuccess') || 'Job saved successfully!' });
+      setTimeout(() => setError(null), 3000);
+    } catch (error) {
+      console.error('Error saving job:', error);
+      setError({ type: 'error', text: t('jobs.saveError') || 'Failed to save job' });
     }
   };
 
@@ -302,7 +313,20 @@ const Jobs = () => {
                   </div>
 
                   {/* View Button */}
-                  <div className="flex-shrink-0">
+                  <div className="flex flex-col gap-2">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleSaveJob(job.id);
+                      }}
+                      className="px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition text-sm font-medium"
+                      title={t('jobs.saveJob') || 'Save Job'}
+                    >
+                      <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+                      </svg>
+                      {t('jobs.save') || 'Save'}
+                    </button>
                     <button className="px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition text-sm font-medium">
                       {t('jobs.viewDetails') || 'View Details'}
                     </button>

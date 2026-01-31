@@ -133,3 +133,75 @@ def get_user_by_id(
             detail="User not found"
         )
     return user
+
+
+@router.post("/me/saved-jobs/{job_id}")
+def save_job(
+    job_id: int,
+    current_user: dict = Depends(get_current_user),
+    db: DatabaseSession
+):
+    """
+    Save a job to user's saved jobs.
+    """
+    user = db.query(User).filter(User.id == int(current_user["user_id"])).first()
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found"
+        )
+    
+    saved_jobs = user.saved_jobs or []
+    if job_id not in saved_jobs:
+        saved_jobs.append(job_id)
+        user.saved_jobs = saved_jobs
+        db.commit()
+    
+    return {"message": "Job saved successfully"}
+
+
+@router.delete("/me/saved-jobs/{job_id}")
+def unsave_job(
+    job_id: int,
+    current_user: dict = Depends(get_current_user),
+    db: DatabaseSession
+):
+    """
+    Remove a job from user's saved jobs.
+    """
+    user = db.query(User).filter(User.id == int(current_user["user_id"])).first()
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found"
+        )
+    
+    saved_jobs = user.saved_jobs or []
+    if job_id in saved_jobs:
+        saved_jobs.remove(job_id)
+        user.saved_jobs = saved_jobs
+        db.commit()
+    
+    return {"message": "Job removed from saved jobs"}
+
+
+@router.get("/me/saved-jobs")
+def get_saved_jobs(
+    current_user: dict = Depends(get_current_user),
+    db: DatabaseSession
+):
+    """
+    Get user's saved jobs.
+    """
+    user = db.query(User).filter(User.id == int(current_user["user_id"])).first()
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found"
+        )
+    
+    from models.job import Job
+    saved_jobs = user.saved_jobs or []
+    jobs = db.query(Job).filter(Job.id.in_(saved_jobs)).all()
+    
+    return {"items": jobs, "count": len(jobs)}

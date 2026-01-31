@@ -96,4 +96,10 @@ export const recommendationsAPI = {
   getJobRecommendations: (params) => api.get('/api/users/me/job-recommendations', { params }),
 };
 
+export const savedJobsAPI = {
+  saveJob: (jobId) => api.post(`/api/users/me/saved-jobs/${jobId}`),
+  unsaveJob: (jobId) => api.delete(`/api/users/me/saved-jobs/${jobId}`),
+  getSavedJobs: () => api.get('/api/users/me/saved-jobs'),
+};
+
 export default api;
