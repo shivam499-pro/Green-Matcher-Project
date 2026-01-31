@@ -1,6 +1,8 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { I18nProvider } from './contexts/I18nContext';
 import LanguageToggle from './components/common/LanguageToggle';
+import Login from './pages/Login';
+import Register from './pages/Register';
 
 function App() {
   return (
@@ -36,6 +38,8 @@ function App() {
                 </p>
               </div>
             </div>} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
             <Route path="/jobs" element={<div className="flex-1 flex items-center justify-center bg-gray-50">
               <div className="text-center">
                 <h1 className="text-3xl font-bold text-gray-900 mb-4">Jobs</h1>
