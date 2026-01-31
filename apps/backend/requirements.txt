@@ -1,0 +1,30 @@
+# Green Matchers - Backend Dependencies
+
+# FastAPI and ASGI server
+fastapi==0.109.0
+uvicorn[standard]==0.27.0
+python-multipart==0.0.6
+
+# Database
+sqlalchemy==2.0.25
+pymysql==1.1.0
+
+# Authentication & Security
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+pydantic-settings==2.1.0
+
+# AI/ML
+sentence-transformers==2.3.1
+torch==2.1.2
+numpy==1.26.3
+scikit-learn==1.4.0
+
+# Translation
+google-cloud-translate==3.12.1
+
+# NLP
+spacy==3.7.2
+
+# Utilities
+python-dotenv==1.0.0

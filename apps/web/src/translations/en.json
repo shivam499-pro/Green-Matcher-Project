@@ -1,0 +1,81 @@
+{
+  "common": {
+    "appName": "Green Matchers",
+    "tagline": "AI-Native Green Jobs Platform for India",
+    "poweredBy": "Powered by AI • Multi-language Support • SDG-Aligned",
+    "home": "Home",
+    "jobs": "Jobs",
+    "careers": "Careers",
+    "profile": "Profile",
+    "login": "Login",
+    "register": "Register",
+    "logout": "Logout",
+    "search": "Search",
+    "apply": "Apply",
+    "save": "Save",
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success"
+  },
+  "landing": {
+    "title": "Find Your Dream Green Job",
+    "subtitle": "AI-powered matching for India's green economy",
+    "browseJobs": "Browse Jobs",
+    "exploreCareers": "Explore Careers",
+    "description": "Discover opportunities in renewable energy, sustainable agriculture, waste management, and more."
+  },
+  "auth": {
+    "loginTitle": "Welcome Back",
+    "loginSubtitle": "Sign in to access your account",
+    "email": "Email",
+    "password": "Password",
+    "rememberMe": "Remember me",
+    "forgotPassword": "Forgot password?",
+    "noAccount": "Don't have an account?",
+    "register": "Register",
+    "registerTitle": "Create Account",
+    "registerSubtitle": "Join thousands of job seekers finding green careers",
+    "fullName": "Full Name",
+    "role": "Role",
+    "roleUser": "Job Seeker",
+    "roleEmployer": "Employer",
+    "language": "Language",
+    "agreeTerms": "I agree to the terms and conditions"
+  },
+  "jobs": {
+    "title": "Green Jobs",
+    "subtitle": "Find opportunities in the green economy",
+    "searchPlaceholder": "Search by job title, skill, or location...",
+    "filterBy": "Filter by",
+    "location": "Location",
+    "salary": "Salary",
+    "sdgGoals": "SDG Goals",
+    "verifiedOnly": "Verified Only",
+    "apply": "Apply Now",
+    "viewDetails": "View Details",
+    "noJobs": "No jobs found",
+    "tryDifferentFilters": "Try different filters"
+  },
+  "careers": {
+    "title": "Green Careers",
+    "subtitle": "Explore sustainable career paths",
+    "searchPlaceholder": "Search careers...",
+    "filterBySkill": "Filter by Skill",
+    "filterBySDG": "Filter by SDG Goal",
+    "demandScore": "Demand Score",
+    "avgSalary": "Average Salary",
+    "requiredSkills": "Required Skills",
+    "noCareers": "No careers found"
+  },
+  "profile": {
+    "title": "My Profile",
+    "editProfile": "Edit Profile",
+    "mySkills": "My Skills",
+    "addSkills": "Add Skills",
+    "skillsPlaceholder": "Enter your skills (comma separated)",
+    "resume": "Resume",
+    "uploadResume": "Upload Resume",
+    "languagePreference": "Language Preference",
+    "saveChanges": "Save Changes"
+  }
+}

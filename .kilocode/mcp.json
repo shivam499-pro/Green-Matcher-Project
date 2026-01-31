@@ -1,0 +1,14 @@
+{
+  "mcpServers": {
+    "apify": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@apify/actors-mcp-server"
+      ],
+      "env": {
+        "APIFY_TOKEN": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbnYiOiJwcm9kdWN0aW9uIiwia2lsb1VzZXJJZCI6IjlkMjE2ZmFmLTQ2NjItNDk5My1hODg3LTE5Zjc1Zjk0ZjQwMyIsImFwaVRva2VuUGVwcGVyIjpudWxsLCJ2ZXJzaW9uIjozLCJpYXQiOjE3Njk4ODAzODUsImV4cCI6MTkyNzY2ODM4NX0.0CJnWM4EEDAbecVNDkjQU2wZWWmLdRpfs5awwzrDsfc"
+      }
+    }
+  }
+}
