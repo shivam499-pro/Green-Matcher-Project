@@ -9,6 +9,7 @@ import Jobs from './pages/Jobs';
 import JobDetail from './pages/JobDetail';
 import JobSeekerDashboard from './pages/JobSeekerDashboard';
 import EmployerDashboard from './pages/EmployerDashboard';
+import AdminDashboard from './pages/AdminDashboard';
 
 function App() {
   return (
@@ -50,6 +51,7 @@ function App() {
             <Route path="/recommendations" element={<Recommendations />} />
             <Route path="/dashboard" element={<JobSeekerDashboard />} />
             <Route path="/employer-dashboard" element={<EmployerDashboard />} />
+            <Route path="/admin-dashboard" element={<AdminDashboard />} />
             <Route path="/jobs" element={<Jobs />} />
             <Route path="/jobs/:id" element={<JobDetail />} />
             <Route path="/careers" element={<div className="flex-1 flex items-center justify-center bg-gray-50">
