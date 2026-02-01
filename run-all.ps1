@@ -6,6 +6,9 @@ Write-Host "   GREEN MATCHERS - COMPLETE RUN   " -ForegroundColor Cyan
 Write-Host "========================================" -ForegroundColor Cyan
 Write-Host ""
 
+# Save original directory to restore later
+$originalLocation = Get-Location
+
 # Step 1: Start Database (MariaDB)
 Write-Host "[Step 1/4] Starting Database (MariaDB)..." -ForegroundColor Yellow
 Write-Host "Checking if MariaDB is running..." -ForegroundColor Gray
@@ -14,7 +17,8 @@ Write-Host "Checking if MariaDB is running..." -ForegroundColor Gray
 $mariadbProcess = Get-Process -Name mysqld -ErrorAction SilentlyContinue
 if ($mariadbProcess) {
     Write-Host "✅ MariaDB is already running" -ForegroundColor Green
-} else {
+}
+else {
     Write-Host "⚠️  MariaDB is not running. Please start MariaDB manually." -ForegroundColor Red
     Write-Host "   Command: net start MariaDB" -ForegroundColor Gray
     Write-Host "   Or use XAMPP/WAMP to start MariaDB" -ForegroundColor Gray
@@ -32,7 +36,8 @@ if (Test-Path "venv") {
     Write-Host "✅ Virtual environment found" -ForegroundColor Green
     Write-Host "Activating virtual environment..." -ForegroundColor Gray
     & .\venv\Scripts\Activate.ps1
-} else {
+}
+else {
     Write-Host "⚠️  Virtual environment not found. Using system Python." -ForegroundColor Yellow
 }
 
@@ -50,12 +55,13 @@ Start-Sleep -Seconds 5
 
 # Check if backend started successfully
 try {
-    $response = Invoke-WebRequest -Uri "http://localhost:8000/docs" -Method GET -TimeoutSec 5
+    $null = Invoke-WebRequest -Uri "http://localhost:8000/docs" -Method GET -TimeoutSec 5
     Write-Host "✅ Backend started successfully!" -ForegroundColor Green
     Write-Host "   API Docs: http://localhost:8000/docs" -ForegroundColor Cyan
     Write-Host "   API Root: http://localhost:8000" -ForegroundColor Cyan
-} catch {
-    Write-Host "❌ Backend failed to start. Check for errors above." -ForegroundColor Red
+}
+catch {
+    Write-Host "❌ Backend failed to start. Error: $($_.Exception.Message)" -ForegroundColor Red
 }
 
 Write-Host ""
@@ -68,7 +74,8 @@ Set-Location "..\web"
 # Check if node_modules exists
 if (Test-Path "node_modules") {
     Write-Host "✅ node_modules found" -ForegroundColor Green
-} else {
+}
+else {
     Write-Host "⚠️  node_modules not found. Running npm install..." -ForegroundColor Yellow
     npm install
 }
@@ -87,11 +94,12 @@ Start-Sleep -Seconds 5
 
 # Check if frontend started successfully
 try {
-    $response = Invoke-WebRequest -Uri "http://localhost:5173" -Method GET -TimeoutSec 5
+    $null = Invoke-WebRequest -Uri "http://localhost:5173" -Method GET -TimeoutSec 5
     Write-Host "✅ Frontend started successfully!" -ForegroundColor Green
     Write-Host "   Frontend URL: http://localhost:5173" -ForegroundColor Cyan
-} catch {
-    Write-Host "❌ Frontend failed to start. Check for errors above." -ForegroundColor Red
+}
+catch {
+    Write-Host "❌ Frontend failed to start. Error: $($_.Exception.Message)" -ForegroundColor Red
 }
 
 Write-Host ""
@@ -236,11 +244,21 @@ try {
     while ($true) {
         Start-Sleep -Seconds 1
     }
-} finally {
+}
+finally {
     # Cleanup when script is stopped
     Write-Host ""
     Write-Host "Stopping servers..." -ForegroundColor Yellow
-    Stop-Job -Name "Backend" -ErrorAction SilentlyContinue
-    Stop-Job -Name "Frontend" -ErrorAction SilentlyContinue
+    if ($backendJob) {
+        Stop-Job -Job $backendJob -ErrorAction SilentlyContinue
+        Remove-Job -Job $backendJob -ErrorAction SilentlyContinue
+    }
+    if ($frontendJob) {
+        Stop-Job -Job $frontendJob -ErrorAction SilentlyContinue
+        Remove-Job -Job $frontendJob -ErrorAction SilentlyContinue
+    }
     Write-Host "✅ All servers stopped" -ForegroundColor Green
+    
+    # Restore original directory
+    Set-Location $originalLocation
 }

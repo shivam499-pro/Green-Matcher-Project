@@ -59,7 +59,7 @@ const Jobs = () => {
       setJobs(response.data.items || response.data || []);
     } catch (error) {
       console.error('Error searching jobs:', error);
-      setError(t('jobs.searchError') || 'Failed to search jobs');
+      setError('Failed to search jobs');
     } finally {
       setLoading(false);
     }

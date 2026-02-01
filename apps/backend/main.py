@@ -6,6 +6,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from core.config import get_settings
 from core.logging import setup_logging
 from core.security_headers import SecurityHeadersMiddleware
+from core.exceptions import register_exception_handlers
+from core.rate_limit import limiter
 from routes import (
     auth_router,
     users_router,
@@ -27,6 +29,12 @@ app = FastAPI(
     docs_url="/docs",
     redoc_url="/redoc"
 )
+
+# Register global exception handlers
+register_exception_handlers(app)
+
+# Add rate limiting
+app.state.limiter = limiter
 
 # Add security headers middleware
 app.add_middleware(SecurityHeadersMiddleware)

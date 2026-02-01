@@ -59,7 +59,7 @@ const Profile = () => {
       });
     } catch (error) {
       console.error('Error fetching profile:', error);
-      setMessage({ type: 'error', text: t('Failed to load profile') });
+      setMessage({ type: 'error', text: 'Failed to load profile' });
     } finally {
       setLoading(false);
     }

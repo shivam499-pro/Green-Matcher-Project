@@ -20,7 +20,7 @@ const Recommendations = () => {
       setRecommendations(response.data.recommendations || []);
     } catch (error) {
       console.error('Error fetching recommendations:', error);
-      setError(t('recommendations.fetchError') || 'Failed to load recommendations');
+      setError('Failed to load recommendations');
     } finally {
       setLoading(false);
     }
