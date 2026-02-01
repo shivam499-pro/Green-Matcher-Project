@@ -16,10 +16,6 @@ class Settings(BaseSettings):
     JWT_ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 7  # 7 days
     
-    # Google Translate API
-    GOOGLE_TRANSLATE_API_KEY: str = ""
-    GOOGLE_TRANSLATE_CREDENTIALS: str = ""  # Path to service account JSON file
-    
     # AI/ML Settings
     EMBEDDING_MODEL: str = "sentence-transformers/all-mpnet-base-v2"
     EMBEDDING_DIM: int = 768

@@ -1,0 +1,674 @@
+{
+  "metadata": {
+    "total_resumes": 15,
+    "generated_date": "2026-02-01T16:45:45.831697",
+    "language_distribution": {
+      "hi": 3,
+      "ta": 2,
+      "en": 3,
+      "te": 2,
+      "bn": 1,
+      "mr": 2,
+      "kn": 1,
+      "pa": 1
+    },
+    "experience_distribution": {
+      "fresher": 2,
+      "entry_level": 3,
+      "mid_level": 5,
+      "senior": 5
+    }
+  },
+  "resumes": [
+    {
+      "id": 1,
+      "name": "Rajesh Kumar Sharma",
+      "location": "Patna, Bihar",
+      "phone": "+91 98765 43210",
+      "email": "rajesh.kumar@email.com",
+      "language": "hi",
+      "experience_years": 5,
+      "job_title": "Solar Installation Technician",
+      "summary": "5 years of experience in solar panel installation and maintenance. Skilled in rooftop and ground-mounted solar systems. Certified solar technician with expertise in troubleshooting and repair.",
+      "skills": [
+        "Solar panel installation",
+        "Photovoltaic system maintenance",
+        "Electrical wiring",
+        "Safety compliance",
+        "Troubleshooting and repair",
+        "Customer service",
+        "Team leadership"
+      ],
+      "experience": [
+        {
+          "title": "Solar Installation Technician",
+          "company": "SunPower India Pvt Ltd",
+          "location": "Patna",
+          "duration": "June 2019 - Present",
+          "achievements": [
+            "Installed 200+ residential and commercial solar panel systems",
+            "Performed routine maintenance and troubleshooting of photovoltaic systems",
+            "Trained junior technicians in safety protocols",
+            "Achieved 98% customer satisfaction rating"
+          ]
+        }
+      ],
+      "education": [
+        {
+          "degree": "ITI Electrician",
+          "institution": "Government ITI Patna",
+          "year": "2017"
+        }
+      ],
+      "certifications": [
+        "Solar PV Installation Certification (NSDC)",
+        "Electrical Safety Training"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "Priya Lakshmi Sundaram",
+      "location": "Coimbatore, Tamil Nadu",
+      "phone": "+91 99876 54321",
+      "email": "priya.sundaram@email.com",
+      "language": "ta",
+      "experience_years": 0,
+      "job_title": "Wind Energy Engineer (Fresher)",
+      "summary": "Recent mechanical engineering graduate passionate about renewable energy. Completed internship in wind turbine maintenance. Eager to contribute to India's wind energy sector.",
+      "skills": [
+        "Wind turbine mechanics",
+        "CAD/CAM (AutoCAD, SolidWorks)",
+        "Computational Fluid Dynamics (CFD)",
+        "Predictive maintenance",
+        "Data analysis",
+        "Technical documentation"
+      ],
+      "experience": [
+        {
+          "title": "Wind Energy Intern",
+          "company": "Suzlon Energy Ltd",
+          "location": "Coimbatore",
+          "duration": "January 2024 - June 2024",
+          "achievements": [
+            "Assisted in preventive maintenance of wind turbines",
+            "Learned blade inspection procedures",
+            "Participated in site surveys for wind farm projects"
+          ]
+        }
+      ],
+      "education": [
+        {
+          "degree": "B.E. Mechanical Engineering",
+          "institution": "Anna University",
+          "year": "2024"
+        }
+      ],
+      "certifications": [
+        "Wind Turbine Safety Training",
+        "AutoCAD Professional"
+      ]
+    },
+    {
+      "id": 3,
+      "name": "Dr. Arjun Mehta",
+      "location": "Mumbai, Maharashtra",
+      "phone": "+91 98888 77777",
+      "email": "arjun.mehta@email.com",
+      "language": "en",
+      "experience_years": 12,
+      "job_title": "Senior Sustainability Consultant",
+      "summary": "Sustainability strategist with 12+ years helping organizations achieve ESG goals. Expert in carbon footprint analysis and sustainable supply chain management. Ph.D. in Environmental Science.",
+      "skills": [
+        "ESG Strategy & Reporting",
+        "Carbon footprint analysis",
+        "Life Cycle Assessment (LCA)",
+        "Sustainability auditing",
+        "GRI, CDP, TCFD frameworks",
+        "Climate risk assessment",
+        "Circular economy",
+        "Data analytics (Python, R)"
+      ],
+      "experience": [
+        {
+          "title": "Senior Sustainability Consultant",
+          "company": "GreenPath Consulting",
+          "location": "Mumbai",
+          "duration": "July 2019 - Present",
+          "achievements": [
+            "Led sustainability projects for 30+ Fortune 500 companies",
+            "Developed carbon neutrality roadmaps with 40% emissions reduction",
+            "Published 15+ white papers on sustainable practices",
+            "Managed team of 8 consultants"
+          ]
+        }
+      ],
+      "education": [
+        {
+          "degree": "Ph.D. Environmental Science",
+          "institution": "IIT Bombay",
+          "year": "2012"
+        }
+      ],
+      "certifications": [
+        "Certified Sustainability Professional (CSP)",
+        "LEED Accredited Professional"
+      ]
+    },
+    {
+      "id": 4,
+      "name": "Venkata Sai Krishna",
+      "location": "Hyderabad, Telangana",
+      "phone": "+91 97654 32109",
+      "email": "sai.krishna@email.com",
+      "language": "te",
+      "experience_years": 2,
+      "job_title": "EV Charging Infrastructure Installer",
+      "summary": "Electrician with 2 years of experience, recently trained in EV charging station installation. Passionate about electric mobility.",
+      "skills": [
+        "EV charging station installation (AC & DC)",
+        "Electrical wiring and safety",
+        "Power distribution systems",
+        "Network configuration basics",
+        "Troubleshooting",
+        "Site assessment"
+      ],
+      "experience": [
+        {
+          "title": "EV Charging Station Installer",
+          "company": "ChargeZone Networks",
+          "location": "Hyderabad",
+          "duration": "September 2023 - Present",
+          "achievements": [
+            "Installed 45+ Level 2 AC charging stations",
+            "Configured DC fast charging units",
+            "Performed electrical safety inspections"
+          ]
+        }
+      ],
+      "education": [
+        {
+          "degree": "Diploma in Electrical Engineering",
+          "institution": "SBTET Telangana",
+          "year": "2022"
+        }
+      ],
+      "certifications": [
+        "EV Charging Infrastructure Installation (NSDC)",
+        "Electrical Safety Certification"
+      ]
+    },
+    {
+      "id": 5,
+      "name": "Ananya Chatterjee",
+      "location": "Kolkata, West Bengal",
+      "phone": "+91 98765 11111",
+      "email": "ananya.c@email.com",
+      "language": "bn",
+      "experience_years": 6,
+      "job_title": "Waste Management Specialist",
+      "summary": "Environmental engineer with 6 years in solid waste management and recycling. Expertise in waste-to-energy projects. Committed to circular economy principles.",
+      "skills": [
+        "Solid waste management",
+        "Waste-to-energy systems",
+        "Composting and recycling",
+        "Environmental impact assessment",
+        "Project management",
+        "GIS mapping"
+      ],
+      "experience": [
+        {
+          "title": "Waste Management Specialist",
+          "company": "Ramky Enviro Engineers",
+          "location": "Kolkata",
+          "duration": "April 2021 - Present",
+          "achievements": [
+            "Designed waste segregation programs for 5 municipalities",
+            "Managed waste-to-energy plant (15 TPD capacity)",
+            "Reduced landfill waste by 40%",
+            "Trained 200+ waste collection workers"
+          ]
+        }
+      ],
+      "education": [
+        {
+          "degree": "B.Tech Environmental Engineering",
+          "institution": "Jadavpur University",
+          "year": "2018"
+        }
+      ],
+      "certifications": [
+        "Certified Waste Management Professional",
+        "Hazardous Waste Management Training"
+      ]
+    },
+    {
+      "id": 6,
+      "name": "Vikram Deshmukh",
+      "location": "Pune, Maharashtra",
+      "phone": "+91 99887 66655",
+      "email": "vikram.deshmukh@email.com",
+      "language": "mr",
+      "experience_years": 10,
+      "job_title": "Green Building Architect",
+      "summary": "Award-winning architect specializing in sustainable building design with 10+ years experience. LEED AP certified with 25+ green building projects completed.",
+      "skills": [
+        "Sustainable building design",
+        "LEED certification process",
+        "Energy modeling (eQuest, EnergyPlus)",
+        "BIM (Revit, ArchiCAD)",
+        "Passive design strategies",
+        "Renewable energy integration"
+      ],
+      "experience": [
+        {
+          "title": "Principal Architect - Sustainable Design",
+          "company": "EcoSpace Architects",
+          "location": "Pune",
+          "duration": "January 2020 - Present",
+          "achievements": [
+            "Led design of 15+ LEED certified buildings",
+            "Achieved 50% energy savings vs conventional buildings",
+            "Won Best Green Building Design award (2023)"
+          ]
+        }
+      ],
+      "education": [
+        {
+          "degree": "M.Arch Sustainable Architecture",
+          "institution": "CEPT University",
+          "year": "2013"
+        }
+      ],
+      "certifications": [
+        "LEED Accredited Professional (BD+C)",
+        "GRIHA Certified Professional"
+      ]
+    },
+    {
+      "id": 7,
+      "name": "Ramesh Singh Yadav",
+      "location": "Jaipur, Rajasthan",
+      "phone": "+91 96543 21987",
+      "email": "ramesh.yadav@email.com",
+      "language": "hi",
+      "experience_years": 7,
+      "job_title": "Organic Farming Consultant",
+      "summary": "Agricultural expert with 7 years in organic farming and sustainable agriculture. Helped 500+ farmers transition to chemical-free farming.",
+      "skills": [
+        "Organic farming methods",
+        "Soil health management",
+        "Composting and vermiculture",
+        "Organic pest management",
+        "Water conservation techniques",
+        "Farmer training"
+      ],
+      "experience": [
+        {
+          "title": "Senior Organic Farming Consultant",
+          "company": "Jaivik Krishi Pvt Ltd",
+          "location": "Jaipur",
+          "duration": "May 2020 - Present",
+          "achievements": [
+            "Trained 500+ farmers in organic techniques",
+            "Implemented organic certification for 100+ farms",
+            "Increased crop yields by 30%"
+          ]
+        }
+      ],
+      "education": [
+        {
+          "degree": "M.Sc. Agronomy",
+          "institution": "Rajasthan Agricultural University",
+          "year": "2017"
+        }
+      ],
+      "certifications": [
+        "Organic Farming Certification (APEDA)",
+        "Integrated Pest Management"
+      ]
+    },
+    {
+      "id": 8,
+      "name": "Deepa Ramachandra",
+      "location": "Bengaluru, Karnataka",
+      "phone": "+91 98234 56789",
+      "email": "deepa.rama@email.com",
+      "language": "kn",
+      "experience_years": 0,
+      "job_title": "Water Conservation Engineer (Fresher)",
+      "summary": "Civil engineering graduate specializing in water resources management. Completed internship in rainwater harvesting systems.",
+      "skills": [
+        "Rainwater harvesting design",
+        "Water quality testing",
+        "Hydraulic modeling",
+        "AutoCAD",
+        "Water auditing",
+        "Technical report writing"
+      ],
+      "experience": [
+        {
+          "title": "Water Conservation Intern",
+          "company": "Biome Environmental Solutions",
+          "location": "Bengaluru",
+          "duration": "January 2024 - May 2024",
+          "achievements": [
+            "Assisted in designing 20+ rainwater harvesting systems",
+            "Conducted water audits for residential complexes",
+            "Prepared technical drawings using AutoCAD"
+          ]
+        }
+      ],
+      "education": [
+        {
+          "degree": "B.E. Civil Engineering",
+          "institution": "BMS College of Engineering",
+          "year": "2024"
+        }
+      ],
+      "certifications": [
+        "Water Auditing Certification",
+        "AutoCAD Professional"
+      ]
+    },
+    {
+      "id": 9,
+      "name": "Rohan Khanna",
+      "location": "Gurugram, Haryana",
+      "phone": "+91 98111 22333",
+      "email": "rohan.khanna@email.com",
+      "language": "en",
+      "experience_years": 5,
+      "job_title": "Carbon Credit Analyst",
+      "summary": "Carbon markets specialist with 5 years in carbon credit verification and ESG reporting. Expert in GHG accounting and climate finance.",
+      "skills": [
+        "Carbon accounting (GHG Protocol)",
+        "Carbon credit verification (VCS, Gold Standard)",
+        "ESG reporting (GRI, SASB, CDP)",
+        "Climate risk assessment",
+        "Life Cycle Assessment",
+        "Data analysis"
+      ],
+      "experience": [
+        {
+          "title": "Carbon Credit Analyst",
+          "company": "Climate Connect India",
+          "location": "Gurugram",
+          "duration": "August 2021 - Present",
+          "achievements": [
+            "Verified 50+ carbon offset projects",
+            "Conducted GHG emission inventories for corporate clients",
+            "Developed carbon neutrality strategies for 15+ companies"
+          ]
+        }
+      ],
+      "education": [
+        {
+          "degree": "MBA Sustainable Business",
+          "institution": "TERI School of Advanced Studies",
+          "year": "2019"
+        }
+      ],
+      "certifications": [
+        "ISO 14064 Lead Verifier",
+        "GHG Inventory Specialist"
+      ]
+    },
+    {
+      "id": 10,
+      "name": "Gurmeet Singh",
+      "location": "Ludhiana, Punjab",
+      "phone": "+91 98765 00000",
+      "email": "gurmeet.singh@email.com",
+      "language": "pa",
+      "experience_years": 1.5,
+      "job_title": "Biogas Plant Operator",
+      "summary": "Mechanical diploma holder with 1.5 years operating biogas plants. Skilled in anaerobic digestion systems and biofuel production.",
+      "skills": [
+        "Biogas plant operation",
+        "Anaerobic digestion process",
+        "Equipment maintenance",
+        "Safety protocols",
+        "Agricultural waste handling"
+      ],
+      "experience": [
+        {
+          "title": "Biogas Plant Operator",
+          "company": "Punjab Renewable Energy Systems",
+          "location": "Ludhiana",
+          "duration": "March 2023 - Present",
+          "achievements": [
+            "Operated 500 cubic meter biogas plant",
+            "Monitored pH, temperature, and gas production daily",
+            "Achieved 85% uptime through preventive maintenance"
+          ]
+        }
+      ],
+      "education": [
+        {
+          "degree": "Diploma Mechanical Engineering",
+          "institution": "Government Polytechnic Ludhiana",
+          "year": "2022"
+        }
+      ],
+      "certifications": [
+        "Biogas Plant Operation and Maintenance (MNRE)"
+      ]
+    },
+    {
+      "id": 11,
+      "name": "Subramanian Iyer",
+      "location": "Chennai, Tamil Nadu",
+      "phone": "+91 98765 44444",
+      "email": "subramanian.iyer@email.com",
+      "language": "ta",
+      "experience_years": 11,
+      "job_title": "Environmental Compliance Officer",
+      "summary": "Environmental compliance expert with 11 years in regulatory compliance and environmental auditing. Deep knowledge of Indian environmental laws.",
+      "skills": [
+        "Environmental law and regulations",
+        "Environmental Impact Assessment (EIA)",
+        "Pollution control systems",
+        "Environmental auditing",
+        "Compliance reporting",
+        "CPCB/SPCB liaison"
+      ],
+      "experience": [
+        {
+          "title": "Senior Environmental Compliance Manager",
+          "company": "Ashok Leyland Ltd",
+          "location": "Chennai",
+          "duration": "June 2018 - Present",
+          "achievements": [
+            "Ensured compliance with Air Act, Water Act, Hazardous Waste Rules",
+            "Conducted internal audits for 8 manufacturing plants",
+            "Zero non-compliance notices in 5 years"
+          ]
+        }
+      ],
+      "education": [
+        {
+          "degree": "M.Sc. Environmental Science",
+          "institution": "University of Madras",
+          "year": "2013"
+        }
+      ],
+      "certifications": [
+        "ISO 14001 Lead Auditor",
+        "EIA Professional"
+      ]
+    },
+    {
+      "id": 12,
+      "name": "Neha Agarwal",
+      "location": "Indore, Madhya Pradesh",
+      "phone": "+91 97654 88888",
+      "email": "neha.agarwal@email.com",
+      "language": "hi",
+      "experience_years": 2,
+      "job_title": "Solar Rooftop Sales Executive",
+      "summary": "Energetic sales professional with 2 years in solar rooftop sales. Strong communication skills and passion for renewable energy.",
+      "skills": [
+        "Solar rooftop sales",
+        "Customer relationship management",
+        "Lead generation",
+        "Product demonstration",
+        "Subsidy and financing knowledge",
+        "Negotiation"
+      ],
+      "experience": [
+        {
+          "title": "Solar Sales Executive",
+          "company": "Vikram Solar",
+          "location": "Indore",
+          "duration": "August 2022 - Present",
+          "achievements": [
+            "Generated 150+ solar rooftop leads",
+            "Closed 45 residential installations (450 kW cumulative)",
+            "Exceeded quarterly sales targets by 20%"
+          ]
+        }
+      ],
+      "education": [
+        {
+          "degree": "BBA",
+          "institution": "Devi Ahilya Vishwavidyalaya",
+          "year": "2022"
+        }
+      ],
+      "certifications": [
+        "Solar PV Basics Training"
+      ]
+    },
+    {
+      "id": 13,
+      "name": "Kiran Kumar Reddy",
+      "location": "Vijayawada, Andhra Pradesh",
+      "phone": "+91 98123 45678",
+      "email": "kiran.reddy@email.com",
+      "language": "te",
+      "experience_years": 4,
+      "job_title": "Electric Vehicle Technician",
+      "summary": "EV technician with 4 years in electric vehicle maintenance and battery management. Certified in EV diagnostics and high-voltage systems.",
+      "skills": [
+        "EV diagnostics and repair",
+        "Battery management systems",
+        "Electric motor maintenance",
+        "High-voltage safety",
+        "Charging system troubleshooting"
+      ],
+      "experience": [
+        {
+          "title": "Senior EV Technician",
+          "company": "Ather Energy",
+          "location": "Vijayawada",
+          "duration": "September 2021 - Present",
+          "achievements": [
+            "Diagnosed and repaired 500+ electric scooters",
+            "Performed battery health assessments",
+            "Maintained 95% first-time-fix rate"
+          ]
+        }
+      ],
+      "education": [
+        {
+          "degree": "Diploma Automobile Engineering",
+          "institution": "SBTET AP",
+          "year": "2020"
+        }
+      ],
+      "certifications": [
+        "EV Technician Certification (Level 2)",
+        "High Voltage Safety Training"
+      ]
+    },
+    {
+      "id": 14,
+      "name": "Anjali Nair",
+      "location": "Kochi, Kerala",
+      "phone": "+91 98888 12345",
+      "email": "anjali.nair@email.com",
+      "language": "en",
+      "experience_years": 9,
+      "job_title": "Green Supply Chain Manager",
+      "summary": "Supply chain professional with 9 years specializing in sustainable procurement and logistics. Led green initiatives saving $2M+ annually.",
+      "skills": [
+        "Sustainable procurement",
+        "Supply chain optimization",
+        "Carbon footprint reduction",
+        "Vendor management",
+        "Data analytics (SAP, Tableau)",
+        "Circular economy",
+        "Lean Six Sigma"
+      ],
+      "experience": [
+        {
+          "title": "Green Supply Chain Manager",
+          "company": "HUL (Hindustan Unilever Ltd)",
+          "location": "Kochi",
+          "duration": "July 2019 - Present",
+          "achievements": [
+            "Implemented sustainable sourcing for 200+ suppliers",
+            "Reduced supply chain emissions by 35%",
+            "Achieved zero-waste-to-landfill",
+            "Reduced plastic packaging by 50 tons/year"
+          ]
+        }
+      ],
+      "education": [
+        {
+          "degree": "MBA Operations Management",
+          "institution": "IIM Kozhikode",
+          "year": "2014"
+        }
+      ],
+      "certifications": [
+        "Certified Green Supply Chain Professional",
+        "Lean Six Sigma Green Belt"
+      ]
+    },
+    {
+      "id": 15,
+      "name": "Sandeep Patil",
+      "location": "Nagpur, Maharashtra",
+      "phone": "+91 98765 99999",
+      "email": "sandeep.patil@email.com",
+      "language": "mr",
+      "experience_years": 8,
+      "job_title": "Renewable Energy Project Manager",
+      "summary": "Experienced project manager with 8 years in renewable energy. Successfully delivered 15+ solar and wind projects totaling 200 MW capacity.",
+      "skills": [
+        "Project management (Solar, Wind)",
+        "Stakeholder management",
+        "Budget management",
+        "Regulatory approvals",
+        "Risk management",
+        "MS Project, Primavera",
+        "Team leadership"
+      ],
+      "experience": [
+        {
+          "title": "Senior Project Manager - Renewable Energy",
+          "company": "Tata Power Renewable Energy",
+          "location": "Nagpur",
+          "duration": "March 2020 - Present",
+          "achievements": [
+            "Managed 100 MW solar farm project ($80M budget)",
+            "Led team of 50+ members",
+            "Completed projects within timeline and under budget"
+          ]
+        }
+      ],
+      "education": [
+        {
+          "degree": "B.E. Electrical Engineering",
+          "institution": "VNIT Nagpur",
+          "year": "2016"
+        }
+      ],
+      "certifications": [
+        "PMP (Project Management Professional)",
+        "LEED Green Associate"
+      ]
+    }
+  ]
+}

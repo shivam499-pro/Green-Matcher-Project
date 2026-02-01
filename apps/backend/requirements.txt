@@ -4,27 +4,36 @@
 fastapi==0.109.0
 uvicorn[standard]==0.27.0
 python-multipart==0.0.6
+starlette<0.36.0,>=0.35.0
+pydantic==2.9.2
+pydantic-core==2.23.4
+email-validator==2.1.1
 
 # Database
-sqlalchemy==2.0.25
+sqlalchemy==2.0.36
 pymysql==1.1.0
+greenlet!=0.4.17
+typing-extensions==4.12.2
 
 # Authentication & Security
 python-jose[cryptography]==3.3.0
 passlib[bcrypt]==1.7.4
+bcrypt==4.0.1
 pydantic-settings==2.1.0
 
 # AI/ML
 sentence-transformers==2.3.1
-torch==2.1.2
-numpy==1.26.3
-scikit-learn==1.4.0
+torch==2.6.0
+numpy==2.1.0
+filelock
+fsspec
+jinja2
+networkx
+setuptools; python_version >= "3.12"
+sympy==1.13.1
 
-# Translation
-google-cloud-translate==3.12.1
-
-# NLP
-spacy==3.7.2
+# NLP (commented out - requires GCC >= 8.4)
+# spacy==3.7.2
 
 # Utilities
 python-dotenv==1.0.0

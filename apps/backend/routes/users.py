@@ -12,8 +12,8 @@ router = APIRouter()
 
 @router.get("/me", response_model=UserResponse)
 def get_current_user_info(
-    current_user: dict = Depends(get_current_user),
-    db: DatabaseSession
+    db: DatabaseSession,
+    current_user: dict = Depends(get_current_user)
 ):
     """
     Get current user information.
@@ -30,8 +30,8 @@ def get_current_user_info(
 @router.put("/me", response_model=UserResponse)
 def update_current_user(
     user_update: UserUpdate,
-    current_user: dict = Depends(get_current_user),
-    db: DatabaseSession
+    db: DatabaseSession,
+    current_user: dict = Depends(get_current_user)
 ):
     """
     Update current user profile.
@@ -62,8 +62,8 @@ def update_current_user(
 @router.put("/me/employer-profile", response_model=UserResponse)
 def update_employer_profile(
     profile_update: EmployerProfileUpdate,
-    current_user: dict = Depends(get_current_user),
-    db: DatabaseSession
+    db: DatabaseSession,
+    current_user: dict = Depends(get_current_user)
 ):
     """
     Update employer profile information.
@@ -98,8 +98,8 @@ def update_employer_profile(
 @router.put("/me/skills", response_model=UserResponse)
 def update_user_skills(
     skills_update: SkillsUpdate,
-    current_user: dict = Depends(get_current_user),
-    db: DatabaseSession
+    db: DatabaseSession,
+    current_user: dict = Depends(get_current_user)
 ):
     """
     Update user skills.
@@ -138,8 +138,8 @@ def get_user_by_id(
 @router.post("/me/saved-jobs/{job_id}")
 def save_job(
     job_id: int,
-    current_user: dict = Depends(get_current_user),
-    db: DatabaseSession
+    db: DatabaseSession,
+    current_user: dict = Depends(get_current_user)
 ):
     """
     Save a job to user's saved jobs.
@@ -163,8 +163,8 @@ def save_job(
 @router.delete("/me/saved-jobs/{job_id}")
 def unsave_job(
     job_id: int,
-    current_user: dict = Depends(get_current_user),
-    db: DatabaseSession
+    db: DatabaseSession,
+    current_user: dict = Depends(get_current_user)
 ):
     """
     Remove a job from user's saved jobs.
@@ -187,8 +187,8 @@ def unsave_job(
 
 @router.get("/me/saved-jobs")
 def get_saved_jobs(
-    current_user: dict = Depends(get_current_user),
-    db: DatabaseSession
+    db: DatabaseSession,
+    current_user: dict = Depends(get_current_user)
 ):
     """
     Get user's saved jobs.
@@ -205,3 +205,96 @@ def get_saved_jobs(
     jobs = db.query(Job).filter(Job.id.in_(saved_jobs)).all()
     
     return {"items": jobs, "count": len(jobs)}
+
+
+@router.get("/me/recommendations")
+def get_career_recommendations(
+    db: DatabaseSession,
+    current_user: dict = Depends(get_current_user),
+    limit: int = 10
+):
+    """
+    Get career recommendations for the current user based on their skills.
+    """
+    user = db.query(User).filter(User.id == int(current_user["user_id"])).first()
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found"
+        )
+    
+    from services.ai.matching import matching_service
+    from models.career import Career
+    
+    # Get career recommendations
+    recommendations = matching_service.get_career_recommendations(db, user, limit=limit)
+    
+    # Format response to match frontend expectations
+    formatted_recommendations = []
+    for rec in recommendations:
+        career = db.query(Career).filter(Career.id == rec["career_id"]).first()
+        if career:
+            formatted_recommendations.append({
+                "career": {
+                    "id": career.id,
+                    "title": career.title,
+                    "description": career.description,
+                    "required_skills": career.required_skills,
+                    "avg_salary_min": career.avg_salary_min,
+                    "avg_salary_max": career.avg_salary_max,
+                    "demand_score": career.demand_score,
+                    "sdg_tags": career.sdg_tags
+                },
+                "similarity_score": rec["similarity_score"],
+                "matched_skills": rec["matched_skills"],
+                "missing_skills": rec["missing_skills"]
+            })
+    
+    return {"recommendations": formatted_recommendations}
+
+
+@router.get("/me/job-recommendations")
+def get_job_recommendations(
+    db: DatabaseSession,
+    current_user: dict = Depends(get_current_user),
+    limit: int = 10
+):
+    """
+    Get job recommendations for the current user based on their skills.
+    """
+    user = db.query(User).filter(User.id == int(current_user["user_id"])).first()
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found"
+        )
+    
+    from services.ai.matching import matching_service
+    from models.job import Job
+    
+    # Get job recommendations
+    recommendations = matching_service.get_job_recommendations(db, user, limit=limit)
+    
+    # Format response to match frontend expectations
+    formatted_recommendations = []
+    for rec in recommendations:
+        job = db.query(Job).filter(Job.id == rec["job_id"]).first()
+        if job:
+            formatted_recommendations.append({
+                "job": {
+                    "id": job.id,
+                    "title": job.title,
+                    "description": job.description,
+                    "company_name": job.company_name,
+                    "location": job.location,
+                    "salary_min": job.salary_min,
+                    "salary_max": job.salary_max,
+                    "required_skills": job.required_skills,
+                    "sdg_tags": job.sdg_tags
+                },
+                "similarity_score": rec["similarity_score"],
+                "matched_skills": rec["matched_skills"],
+                "missing_skills": rec["missing_skills"]
+            })
+    
+    return {"recommendations": formatted_recommendations}

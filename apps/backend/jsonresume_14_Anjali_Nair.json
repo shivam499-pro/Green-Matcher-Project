@@ -1,0 +1,106 @@
+{
+  "$schema": "https://raw.githubusercontent.com/jsonresume/resume-schema/v1.0.0/schema.json",
+  "meta": {
+    "canonical": "https://greenmatchers.in/resume/14",
+    "version": "v1.0.0",
+    "lastModified": "2026-02-01T16:52:14.113074"
+  },
+  "basics": {
+    "name": "Anjali Nair",
+    "label": "Green Supply Chain Manager",
+    "email": "anjali.nair@email.com",
+    "phone": "+91 98888 12345",
+    "summary": "Supply chain professional with 9 years specializing in sustainable procurement and logistics. Led green initiatives saving $2M+ annually.",
+    "location": {
+      "city": "Kochi",
+      "countryCode": "IN",
+      "region": "Kerala"
+    },
+    "profiles": []
+  },
+  "work": [
+    {
+      "name": "HUL (Hindustan Unilever Ltd)",
+      "position": "Green Supply Chain Manager",
+      "location": "Kochi",
+      "startDate": "2019-07",
+      "endDate": "",
+      "summary": "Green jobs experience in green supply chain manager",
+      "highlights": [
+        "Implemented sustainable sourcing for 200+ suppliers",
+        "Reduced supply chain emissions by 35%",
+        "Achieved zero-waste-to-landfill",
+        "Reduced plastic packaging by 50 tons/year"
+      ]
+    }
+  ],
+  "education": [
+    {
+      "institution": "IIM Kozhikode",
+      "area": "MBA Operations Management",
+      "studyType": "Masters",
+      "startDate": "",
+      "endDate": "2014",
+      "gpa": ""
+    }
+  ],
+  "skills": [
+    {
+      "name": "Environmental & Sustainability",
+      "level": "Advanced",
+      "keywords": [
+        "Carbon footprint reduction"
+      ]
+    },
+    {
+      "name": "Management & Leadership",
+      "level": "Advanced",
+      "keywords": [
+        "Vendor management"
+      ]
+    },
+    {
+      "name": "Other Skills",
+      "level": "Advanced",
+      "keywords": [
+        "Sustainable procurement",
+        "Supply chain optimization",
+        "Data analytics (SAP, Tableau)",
+        "Circular economy",
+        "Lean Six Sigma"
+      ]
+    }
+  ],
+  "languages": [
+    {
+      "language": "English",
+      "fluency": "Native speaker"
+    },
+    {
+      "language": "English",
+      "fluency": "Native speaker"
+    }
+  ],
+  "interests": [
+    {
+      "name": "Sustainability",
+      "keywords": [
+        "Green Energy",
+        "Environmental Conservation",
+        "Climate Action"
+      ]
+    }
+  ],
+  "certificates": [
+    {
+      "name": "Certified Green Supply Chain Professional",
+      "date": "",
+      "issuer": "Professional Organization"
+    },
+    {
+      "name": "Lean Six Sigma Green Belt",
+      "date": "",
+      "issuer": "Professional Organization"
+    }
+  ]
+}

@@ -1,0 +1,107 @@
+{
+  "$schema": "https://raw.githubusercontent.com/jsonresume/resume-schema/v1.0.0/schema.json",
+  "meta": {
+    "canonical": "https://greenmatchers.in/resume/3",
+    "version": "v1.0.0",
+    "lastModified": "2026-02-01T16:52:14.108673"
+  },
+  "basics": {
+    "name": "Dr. Arjun Mehta",
+    "label": "Senior Sustainability Consultant",
+    "email": "arjun.mehta@email.com",
+    "phone": "+91 98888 77777",
+    "summary": "Sustainability strategist with 12+ years helping organizations achieve ESG goals. Expert in carbon footprint analysis and sustainable supply chain management. Ph.D. in Environmental Science.",
+    "location": {
+      "city": "Mumbai",
+      "countryCode": "IN",
+      "region": "Maharashtra"
+    },
+    "profiles": []
+  },
+  "work": [
+    {
+      "name": "GreenPath Consulting",
+      "position": "Senior Sustainability Consultant",
+      "location": "Mumbai",
+      "startDate": "2019-07",
+      "endDate": "",
+      "summary": "Green jobs experience in senior sustainability consultant",
+      "highlights": [
+        "Led sustainability projects for 30+ Fortune 500 companies",
+        "Developed carbon neutrality roadmaps with 40% emissions reduction",
+        "Published 15+ white papers on sustainable practices",
+        "Managed team of 8 consultants"
+      ]
+    }
+  ],
+  "education": [
+    {
+      "institution": "IIT Bombay",
+      "area": "Ph.D. Environmental Science",
+      "studyType": "PhD",
+      "startDate": "",
+      "endDate": "2012",
+      "gpa": ""
+    }
+  ],
+  "skills": [
+    {
+      "name": "Technical Skills",
+      "level": "Advanced",
+      "keywords": [
+        "Carbon footprint analysis"
+      ]
+    },
+    {
+      "name": "Environmental & Sustainability",
+      "level": "Advanced",
+      "keywords": [
+        "Sustainability auditing"
+      ]
+    },
+    {
+      "name": "Other Skills",
+      "level": "Advanced",
+      "keywords": [
+        "ESG Strategy & Reporting",
+        "Life Cycle Assessment (LCA)",
+        "GRI, CDP, TCFD frameworks",
+        "Climate risk assessment",
+        "Circular economy",
+        "Data analytics (Python, R)"
+      ]
+    }
+  ],
+  "languages": [
+    {
+      "language": "English",
+      "fluency": "Native speaker"
+    },
+    {
+      "language": "English",
+      "fluency": "Native speaker"
+    }
+  ],
+  "interests": [
+    {
+      "name": "Sustainability",
+      "keywords": [
+        "Green Energy",
+        "Environmental Conservation",
+        "Climate Action"
+      ]
+    }
+  ],
+  "certificates": [
+    {
+      "name": "Certified Sustainability Professional (CSP)",
+      "date": "",
+      "issuer": "Professional Organization"
+    },
+    {
+      "name": "LEED Accredited Professional",
+      "date": "",
+      "issuer": "Green Building Council"
+    }
+  ]
+}

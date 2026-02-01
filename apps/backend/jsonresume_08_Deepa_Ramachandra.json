@@ -1,0 +1,98 @@
+{
+  "$schema": "https://raw.githubusercontent.com/jsonresume/resume-schema/v1.0.0/schema.json",
+  "meta": {
+    "canonical": "https://greenmatchers.in/resume/8",
+    "version": "v1.0.0",
+    "lastModified": "2026-02-01T16:52:14.110724"
+  },
+  "basics": {
+    "name": "Deepa Ramachandra",
+    "label": "Water Conservation Engineer (Fresher)",
+    "email": "deepa.rama@email.com",
+    "phone": "+91 98234 56789",
+    "summary": "Civil engineering graduate specializing in water resources management. Completed internship in rainwater harvesting systems.",
+    "location": {
+      "city": "Bengaluru",
+      "countryCode": "IN",
+      "region": "Karnataka"
+    },
+    "profiles": []
+  },
+  "work": [
+    {
+      "name": "Biome Environmental Solutions",
+      "position": "Water Conservation Intern",
+      "location": "Bengaluru",
+      "startDate": "2024-01",
+      "endDate": "2024-05",
+      "summary": "Green jobs experience in water conservation engineer (fresher)",
+      "highlights": [
+        "Assisted in designing 20+ rainwater harvesting systems",
+        "Conducted water audits for residential complexes",
+        "Prepared technical drawings using AutoCAD"
+      ]
+    }
+  ],
+  "education": [
+    {
+      "institution": "BMS College of Engineering",
+      "area": "B.E. Civil Engineering",
+      "studyType": "Bachelors",
+      "startDate": "",
+      "endDate": "2024",
+      "gpa": ""
+    }
+  ],
+  "skills": [
+    {
+      "name": "Technical Skills",
+      "level": "Advanced",
+      "keywords": [
+        "Water quality testing"
+      ]
+    },
+    {
+      "name": "Other Skills",
+      "level": "Advanced",
+      "keywords": [
+        "Rainwater harvesting design",
+        "Hydraulic modeling",
+        "AutoCAD",
+        "Water auditing",
+        "Technical report writing"
+      ]
+    }
+  ],
+  "languages": [
+    {
+      "language": "Kannada",
+      "fluency": "Native speaker"
+    },
+    {
+      "language": "English",
+      "fluency": "Conversational"
+    }
+  ],
+  "interests": [
+    {
+      "name": "Sustainability",
+      "keywords": [
+        "Green Energy",
+        "Environmental Conservation",
+        "Climate Action"
+      ]
+    }
+  ],
+  "certificates": [
+    {
+      "name": "Water Auditing Certification",
+      "date": "",
+      "issuer": "Professional Organization"
+    },
+    {
+      "name": "AutoCAD Professional",
+      "date": "",
+      "issuer": "Professional Organization"
+    }
+  ]
+}

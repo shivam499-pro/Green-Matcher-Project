@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { useI18n } from '../contexts/I18nContext';
 import { authAPI } from '../utils/api';
 
 /**
@@ -9,7 +8,6 @@ import { authAPI } from '../utils/api';
  */
 const Login = () => {
   const navigate = useNavigate();
-  const { t } = useI18n();
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -29,13 +27,22 @@ const Login = () => {
 
     try {
       const response = await authAPI.login(formData);
-      
+
       // Store token in localStorage
       localStorage.setItem('token', response.data.access_token);
       localStorage.setItem('user', JSON.stringify(response.data.user));
-      
-      // Navigate to home
-      navigate('/');
+
+      // Navigate based on user role
+      const role = response.data.user.role;
+      if (role === 'USER') {
+        navigate('/dashboard');
+      } else if (role === 'EMPLOYER') {
+        navigate('/employer-dashboard');
+      } else if (role === 'ADMIN') {
+        navigate('/admin-dashboard');
+      } else {
+        navigate('/');
+      }
     } catch (err) {
       setError(err.response?.data?.detail || t('errors.invalidCredentials'));
     } finally {
@@ -48,10 +55,10 @@ const Login = () => {
       <div className="max-w-md w-full space-y-8">
         <div className="text-center">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            {t('auth.login')}
+            {t('Login')}
           </h1>
           <p className="text-gray-600 mb-8">
-            {t('auth.signIn')}
+            {t('SignIn')}
           </p>
         </div>
 
@@ -64,7 +71,7 @@ const Login = () => {
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
             <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-              {t('auth.email')}
+              {t('EmailAddress')}
             </label>
             <input
               type="email"
@@ -80,7 +87,7 @@ const Login = () => {
 
           <div>
             <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
-              {t('auth.password')}
+              {t('Enter your password')}
             </label>
             <input
               type="password"
@@ -97,22 +104,22 @@ const Login = () => {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3 px-4 bg-primary-500 text-white rounded-lg hover:bg-primary-600 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed font-medium transition"
+            className="w-full py-3 px-4 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed font-medium transition-colors"
           >
-            {loading ? t('common.loading') : t('auth.signIn')}
+            {loading ? t('common.loading') : t('SignIn')}
           </button>
         </form>
 
         <div className="text-center mt-6">
           <p className="text-sm text-gray-600">
-            {t('auth.noAccount')}{' '}
-            <Link to="/register" className="text-primary-600 hover:underline font-medium">
-              {t('auth.signUp')}
+            {t('No account yet?')}{' '}
+            <Link to="/register" className="text-emerald-600 hover:underline font-medium">
+              {t('RegisterHere')}
             </Link>
           </p>
           <p className="text-sm text-gray-500 mt-4">
             <Link to="/" className="text-gray-600 hover:underline">
-              ← {t('common.home')}
+              ← {t('BackToHome')}
             </Link>
           </p>
         </div>

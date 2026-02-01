@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { useI18n } from '../contexts/I18nContext';
+
 import { authAPI } from '../utils/api';
 
 /**
@@ -9,7 +9,7 @@ import { authAPI } from '../utils/api';
  */
 const Register = () => {
   const navigate = useNavigate();
-  const { t } = useI18n();
+  
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -39,11 +39,11 @@ const Register = () => {
 
     try {
       const response = await authAPI.register(formData);
-      
+
       // Store token and user in localStorage
       localStorage.setItem('token', response.data.access_token);
       localStorage.setItem('user', JSON.stringify(response.data.user));
-      
+
       // Navigate to home
       navigate('/');
     } catch (err) {
@@ -58,10 +58,10 @@ const Register = () => {
       <div className="max-w-md w-full space-y-8">
         <div className="text-center">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            {t('auth.register')}
+            {t('Register')}
           </h1>
           <p className="text-gray-600 mb-8">
-            {t('auth.signUp')}
+            {t('SignUp')}
           </p>
         </div>
 
@@ -74,7 +74,7 @@ const Register = () => {
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
             <label htmlFor="fullName" className="block text-sm font-medium text-gray-700 mb-2">
-              {t('profile.fullName')}
+              {t('FullName')}
             </label>
             <input
               type="text"
@@ -90,7 +90,7 @@ const Register = () => {
 
           <div>
             <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-              {t('auth.email')}
+              {t('EmailAddress')}
             </label>
             <input
               type="email"
@@ -106,7 +106,7 @@ const Register = () => {
 
           <div>
             <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
-              {t('auth.password')}
+              {t('Enter your password')}
             </label>
             <input
               type="password"
@@ -117,13 +117,13 @@ const Register = () => {
               required
               minLength={6}
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-              placeholder="••••••"
+              placeholder="•••••"
             />
           </div>
 
           <div>
             <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-2">
-              {t('auth.confirmPassword')}
+              {t('ConfirmPassword')}
             </label>
             <input
               type="password"
@@ -134,13 +134,13 @@ const Register = () => {
               required
               minLength={6}
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-              placeholder="••••••"
+              placeholder="•••••"
             />
           </div>
 
           <div>
             <label htmlFor="role" className="block text-sm font-medium text-gray-700 mb-2">
-              {t('auth.role')}
+              {t('SelectRole')}
             </label>
             <select
               id="role"
@@ -158,22 +158,22 @@ const Register = () => {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3 px-4 bg-primary-500 text-white rounded-lg hover:bg-primary-600 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed font-medium transition"
+            className="w-full py-3 px-4 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed font-medium transition-colors"
           >
-            {loading ? t('common.loading') : t('auth.signUp')}
+            {loading ? t('common.loading') : t('SignUp')}
           </button>
         </form>
 
         <div className="text-center mt-6 space-y-4">
           <p className="text-sm text-gray-600">
-            {t('auth.hasAccount')}{' '}
-            <Link to="/login" className="text-primary-600 hover:underline font-medium">
-              {t('auth.signIn')}
+            {t('Already have an account?')}{' '}
+            <Link to="/login" className="text-emerald-600 hover:underline font-medium">
+              {t('LoginHere')}
             </Link>
           </p>
           <p className="text-sm text-gray-500">
             <Link to="/" className="text-gray-600 hover:underline">
-              ← {t('common.home')}
+              ← {t('BackToHome')}
             </Link>
           </p>
         </div>

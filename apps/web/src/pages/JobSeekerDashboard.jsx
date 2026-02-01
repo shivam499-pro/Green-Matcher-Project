@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useI18n } from '../contexts/I18nContext';
+
 import { applicationsAPI, jobsAPI, recommendationsAPI, savedJobsAPI } from '../utils/api';
 
 const JobSeekerDashboard = () => {
-  const { t } = useI18n();
+  
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('applications');
@@ -34,7 +34,7 @@ const JobSeekerDashboard = () => {
       }
     } catch (error) {
       console.error('Error fetching dashboard data:', error);
-      setError(t('dashboard.fetchError') || 'Failed to load data');
+      setError(t('Failed to load data'));
     } finally {
       setLoading(false);
     }
@@ -46,7 +46,7 @@ const JobSeekerDashboard = () => {
       setSavedJobs(prev => prev.filter(job => job.id !== jobId));
     } catch (error) {
       console.error('Error unsaving job:', error);
-      setError(t('dashboard.unsaveJobError') || 'Failed to remove job from saved');
+      setError(t('Failed to remove job from saved'));
     }
   };
 
@@ -73,9 +73,9 @@ const JobSeekerDashboard = () => {
   };
 
   const tabs = [
-    { id: 'applications', label: t('dashboard.myApplications') || 'My Applications', count: applications.length },
-    { id: 'saved', label: t('dashboard.savedJobs') || 'Saved Jobs', count: savedJobs.length },
-    { id: 'recommendations', label: t('dashboard.recommended') || 'Recommended', count: recommendations.length },
+    { id: 'applications', label: t('My Applications'), count: applications.length },
+    { id: 'saved', label: t('Saved Jobs'), count: savedJobs.length },
+    { id: 'recommendations', label: t('Recommended Jobs'), count: recommendations.length },
   ];
 
   return (
@@ -84,30 +84,30 @@ const JobSeekerDashboard = () => {
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900">
-            {t('dashboard.title') || 'Dashboard'}
+            {t('Dashboard')}
           </h1>
           <p className="mt-2 text-gray-600">
-            {t('dashboard.subtitle') || 'Manage your job search journey'}
+            {t('Manage your job search journey')}
           </p>
         </div>
 
         {/* Quick Stats */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
-          <div className="bg-white rounded-xl shadow-sm p-6">
+          <div className="bg-white rounded-lg p-6 border border-gray-200">
             <div className="flex items-center">
               <div className="flex-1">
-                <p className="text-sm text-gray-600">{t('dashboard.totalApplications') || 'Total Applications'}</p>
+                <p className="text-sm text-gray-600">{t('Total Applications')}</p>
                 <p className="text-3xl font-bold text-gray-900">{applications.length}</p>
               </div>
-              <div className="w-12 h-12 bg-primary-100 rounded-full flex items-center justify-center">
-                <svg className="w-6 h-6 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center">
+                <svg className="w-6 h-6 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
               </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-xl shadow-sm p-6">
+          <div className="bg-white rounded-lg p-6 border border-gray-200">
             <div className="flex items-center">
               <div className="flex-1">
                 <p className="text-sm text-gray-600">{t('dashboard.savedJobs') || 'Saved Jobs'}</p>
@@ -115,16 +115,16 @@ const JobSeekerDashboard = () => {
               </div>
               <div className="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center">
                 <svg className="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21z" />
                 </svg>
               </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-xl shadow-sm p-6">
+          <div className="bg-white rounded-lg p-6 border border-gray-200">
             <div className="flex items-center">
               <div className="flex-1">
-                <p className="text-sm text-gray-600">{t('dashboard.recommendedJobs') || 'Recommended Jobs'}</p>
+                <p className="text-sm text-gray-600">{t('Recommended Jobs')}</p>
                 <p className="text-3xl font-bold text-gray-900">{recommendations.length}</p>
               </div>
               <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
@@ -137,16 +137,16 @@ const JobSeekerDashboard = () => {
         </div>
 
         {/* Tabs */}
-        <div className="bg-white rounded-xl shadow-sm mb-6">
+        <div className="bg-white rounded-lg mb-6 border border-gray-200">
           <div className="border-b border-gray-200">
             <nav className="flex -mb-px">
               {tabs.map((tab) => (
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`flex-1 px-6 py-4 text-sm font-medium border-b-2 transition ${
+                  className={`flex-1 px-6 py-4 text-sm font-medium border-b-2 transition-colors ${
                     activeTab === tab.id
-                      ? 'border-primary-500 text-primary-600'
+                      ? 'border-emerald-600 text-emerald-600'
                       : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                   }`}
                 >
@@ -164,7 +164,7 @@ const JobSeekerDashboard = () => {
 
         {/* Error */}
         {error && (
-          <div className="mb-6 p-4 bg-red-50 text-red-800 rounded-lg">
+          <div className="mb-6 p-4 bg-red-50 text-red-800 rounded-lg border border-red-200">
             {error}
           </div>
         )}
@@ -172,7 +172,7 @@ const JobSeekerDashboard = () => {
         {/* Loading */}
         {loading && (
           <div className="flex items-center justify-center py-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600"></div>
           </div>
         )}
 
@@ -180,28 +180,28 @@ const JobSeekerDashboard = () => {
         {!loading && activeTab === 'applications' && (
           <div className="space-y-4">
             {applications.length === 0 ? (
-              <div className="bg-white rounded-xl shadow-sm p-12 text-center">
+              <div className="bg-white rounded-lg p-12 text-center border border-gray-200">
                 <svg className="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
                 <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                  {t('dashboard.noApplications') || 'No applications yet'}
+                  {t('No applications yet')}
                 </h3>
                 <p className="text-gray-600 mb-6">
-                  {t('dashboard.noApplicationsHint') || 'Start applying to jobs to track your progress'}
+                  {t('Start applying to jobs to track your progress')}
                 </p>
                 <button
                   onClick={() => navigate('/jobs')}
-                  className="px-6 py-3 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition"
+                  className="px-6 py-3 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors"
                 >
-                  {t('dashboard.browseJobs') || 'Browse Jobs'}
+                  {t('Browse Jobs')}
                 </button>
               </div>
             ) : (
               applications.map((app) => (
                 <div
                   key={app.id}
-                  className="bg-white rounded-xl shadow-sm hover:shadow-md transition p-6 cursor-pointer"
+                  className="bg-white rounded-lg border border-gray-200 hover:border-emerald-500 transition-colors p-6 cursor-pointer"
                   onClick={() => navigate(`/jobs/${app.job.id}`)}
                 >
                   <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
@@ -253,28 +253,28 @@ const JobSeekerDashboard = () => {
         {!loading && activeTab === 'saved' && (
           <div className="space-y-4">
             {savedJobs.length === 0 ? (
-              <div className="bg-white rounded-xl shadow-sm p-12 text-center">
+              <div className="bg-white rounded-lg p-12 text-center border border-gray-200">
                 <svg className="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21z" />
                 </svg>
                 <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                  {t('dashboard.noSavedJobs') || 'No saved jobs yet'}
+                  {t('No saved jobs yet')}
                 </h3>
                 <p className="text-gray-600 mb-6">
-                  {t('dashboard.noSavedJobsHint') || 'Save jobs you\'re interested in to review later'}
+                  {t('Save jobs you\'re interested in to review later')}
                 </p>
                 <button
                   onClick={() => navigate('/jobs')}
-                  className="px-6 py-3 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition"
+                  className="px-6 py-3 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors"
                 >
-                  {t('dashboard.browseJobs') || 'Browse Jobs'}
+                  {t('Browse Jobs')}
                 </button>
               </div>
             ) : (
               savedJobs.map((job) => (
                 <div
                   key={job.id}
-                  className="bg-white rounded-xl shadow-sm hover:shadow-md transition p-6"
+                  className="bg-white rounded-lg border border-gray-200 hover:border-emerald-500 transition-colors p-6"
                 >
                   <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
                     <div className="flex-1">
@@ -286,10 +286,10 @@ const JobSeekerDashboard = () => {
                         <button
                           onClick={() => handleUnsaveJob(job.id)}
                           className="text-red-500 hover:text-red-700"
-                          title={t('dashboard.unsaveJob') || 'Remove from saved'}
+                          title={t('Remove from saved')}
                         >
                           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21z" />
                           </svg>
                         </button>
                       </div>
@@ -331,9 +331,9 @@ const JobSeekerDashboard = () => {
                     <div className="flex flex-col gap-2">
                       <button
                         onClick={() => navigate(`/jobs/${job.id}`)}
-                        className="px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition text-sm font-medium"
+                        className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors text-sm font-medium"
                       >
-                        {t('dashboard.view') || 'View'}
+                        {t('View')}
                       </button>
                     </div>
                   </div>
@@ -347,28 +347,28 @@ const JobSeekerDashboard = () => {
         {!loading && activeTab === 'recommendations' && (
           <div className="space-y-4">
             {recommendations.length === 0 ? (
-              <div className="bg-white rounded-xl shadow-sm p-12 text-center">
+              <div className="bg-white rounded-lg p-12 text-center border border-gray-200">
                 <svg className="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
                 </svg>
                 <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                  {t('dashboard.noRecommendations') || 'No recommendations yet'}
+                  {t('No recommendations yet')}
                 </h3>
                 <p className="text-gray-600 mb-6">
-                  {t('dashboard.noRecommendationsHint') || 'Update your profile to get personalized job recommendations'}
+                  {t('Update your profile to get personalized job recommendations')}
                 </p>
                 <button
                   onClick={() => navigate('/profile')}
-                  className="px-6 py-3 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition"
+                  className="px-6 py-3 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors"
                 >
-                  {t('dashboard.updateProfile') || 'Update Profile'}
+                  {t('Update Profile')}
                 </button>
               </div>
             ) : (
               recommendations.map((rec) => (
                 <div
                   key={rec.job.id}
-                  className="bg-white rounded-xl shadow-sm hover:shadow-md transition p-6 cursor-pointer"
+                  className="bg-white rounded-lg border border-gray-200 hover:border-emerald-500 transition-colors p-6 cursor-pointer"
                   onClick={() => navigate(`/jobs/${rec.job.id}`)}
                 >
                   <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
@@ -415,6 +415,15 @@ const JobSeekerDashboard = () => {
                           ))}
                         </div>
                       )}
+                    </div>
+
+                    <div className="flex flex-col gap-2">
+                      <button
+                        onClick={() => navigate(`/jobs/${rec.job.id}`)}
+                        className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors text-sm font-medium"
+                      >
+                        {t('View')}
+                      </button>
                     </div>
                   </div>
                 </div>

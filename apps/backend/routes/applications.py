@@ -15,12 +15,12 @@ router = APIRouter()
 
 @router.get("", response_model=List[ApplicationResponse])
 def list_applications(
+    db: DatabaseSession,
     job_id: Optional[int] = None,
     status_filter: Optional[str] = None,
     skip: int = 0,
     limit: int = 20,
-    current_user: dict = Depends(get_current_user),
-    db: DatabaseSession = Depends()
+    current_user: dict = Depends(get_current_user)
 ):
     """
     List applications for current user or employer's jobs.
@@ -55,9 +55,9 @@ def list_applications(
 
 @router.get("/{application_id}", response_model=ApplicationDetailResponse)
 def get_application(
+    db: DatabaseSession,
     application_id: int,
-    current_user: dict = Depends(get_current_user),
-    db: DatabaseSession = Depends()
+    current_user: dict = Depends(get_current_user)
 ):
     """
     Get application details by ID.
@@ -116,8 +116,8 @@ def get_application(
 @router.post("", response_model=ApplicationResponse, status_code=status.HTTP_201_CREATED)
 def create_application(
     application_data: ApplicationCreate,
-    current_user: dict = Depends(get_current_user),
-    db: DatabaseSession = Depends()
+    db: DatabaseSession,
+    current_user: dict = Depends(get_current_user)
 ):
     """
     Apply to a job (job seeker only).
@@ -169,8 +169,8 @@ def create_application(
 def update_application(
     application_id: int,
     application_update: ApplicationUpdate,
-    current_user: dict = Depends(get_current_user),
-    db: DatabaseSession = Depends()
+    db: DatabaseSession,
+    current_user: dict = Depends(get_current_user)
 ):
     """
     Update application status (employer only).
@@ -203,8 +203,8 @@ def update_application(
 @router.delete("/{application_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_application(
     application_id: int,
-    current_user: dict = Depends(get_current_user),
-    db: DatabaseSession = Depends()
+    db: DatabaseSession,
+    current_user: dict = Depends(get_current_user)
 ):
     """
     Delete an application (job seeker only, can only delete own applications).

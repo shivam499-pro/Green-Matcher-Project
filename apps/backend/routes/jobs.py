@@ -14,6 +14,7 @@ router = APIRouter()
 
 @router.get("", response_model=List[JobResponse])
 def list_jobs(
+    db: DatabaseSession,
     search: Optional[str] = None,
     career_id: Optional[int] = None,
     location: Optional[str] = None,
@@ -22,8 +23,7 @@ def list_jobs(
     sdg_tag: Optional[int] = None,
     verified_only: bool = False,
     skip: int = 0,
-    limit: int = 20,
-    db: DatabaseSession = Depends()
+    limit: int = 20
 ):
     """
     List jobs with optional filters.
@@ -57,7 +57,7 @@ def list_jobs(
 
 
 @router.get("/{job_id}", response_model=JobDetailResponse)
-def get_job(job_id: int, db: DatabaseSession = Depends()):
+def get_job(job_id: int, db: DatabaseSession):
     """
     Get job details by ID.
     """
@@ -100,8 +100,8 @@ def get_job(job_id: int, db: DatabaseSession = Depends()):
 @router.post("", response_model=JobResponse, status_code=status.HTTP_201_CREATED)
 def create_job(
     job_data: JobCreate,
-    current_user: dict = Depends(get_current_user),
-    db: DatabaseSession = Depends()
+    db: DatabaseSession,
+    current_user: dict = Depends(get_current_user)
 ):
     """
     Create a new job posting (employer only).
@@ -139,8 +139,8 @@ def create_job(
 def update_job(
     job_id: int,
     job_update: JobUpdate,
-    current_user: dict = Depends(get_current_user),
-    db: DatabaseSession = Depends()
+    db: DatabaseSession,
+    current_user: dict = Depends(get_current_user)
 ):
     """
     Update a job posting (employer only).
@@ -187,8 +187,8 @@ def update_job(
 @router.delete("/{job_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_job(
     job_id: int,
-    current_user: dict = Depends(get_current_user),
-    db: DatabaseSession = Depends()
+    db: DatabaseSession,
+    current_user: dict = Depends(get_current_user)
 ):
     """
     Delete a job posting (employer only).

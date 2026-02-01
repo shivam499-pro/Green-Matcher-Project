@@ -1,0 +1,98 @@
+{
+  "$schema": "https://raw.githubusercontent.com/jsonresume/resume-schema/v1.0.0/schema.json",
+  "meta": {
+    "canonical": "https://greenmatchers.in/resume/11",
+    "version": "v1.0.0",
+    "lastModified": "2026-02-01T16:52:14.112007"
+  },
+  "basics": {
+    "name": "Subramanian Iyer",
+    "label": "Environmental Compliance Officer",
+    "email": "subramanian.iyer@email.com",
+    "phone": "+91 98765 44444",
+    "summary": "Environmental compliance expert with 11 years in regulatory compliance and environmental auditing. Deep knowledge of Indian environmental laws.",
+    "location": {
+      "city": "Chennai",
+      "countryCode": "IN",
+      "region": "Tamil Nadu"
+    },
+    "profiles": []
+  },
+  "work": [
+    {
+      "name": "Ashok Leyland Ltd",
+      "position": "Senior Environmental Compliance Manager",
+      "location": "Chennai",
+      "startDate": "2018-06",
+      "endDate": "",
+      "summary": "Green jobs experience in environmental compliance officer",
+      "highlights": [
+        "Ensured compliance with Air Act, Water Act, Hazardous Waste Rules",
+        "Conducted internal audits for 8 manufacturing plants",
+        "Zero non-compliance notices in 5 years"
+      ]
+    }
+  ],
+  "education": [
+    {
+      "institution": "University of Madras",
+      "area": "M.Sc. Environmental Science",
+      "studyType": "Masters",
+      "startDate": "",
+      "endDate": "2013",
+      "gpa": ""
+    }
+  ],
+  "skills": [
+    {
+      "name": "Environmental & Sustainability",
+      "level": "Advanced",
+      "keywords": [
+        "Environmental law and regulations",
+        "Environmental Impact Assessment (EIA)",
+        "Environmental auditing"
+      ]
+    },
+    {
+      "name": "Other Skills",
+      "level": "Advanced",
+      "keywords": [
+        "Pollution control systems",
+        "Compliance reporting",
+        "CPCB/SPCB liaison"
+      ]
+    }
+  ],
+  "languages": [
+    {
+      "language": "Tamil",
+      "fluency": "Native speaker"
+    },
+    {
+      "language": "English",
+      "fluency": "Conversational"
+    }
+  ],
+  "interests": [
+    {
+      "name": "Sustainability",
+      "keywords": [
+        "Green Energy",
+        "Environmental Conservation",
+        "Climate Action"
+      ]
+    }
+  ],
+  "certificates": [
+    {
+      "name": "ISO 14001 Lead Auditor",
+      "date": "",
+      "issuer": "International Organization for Standardization"
+    },
+    {
+      "name": "EIA Professional",
+      "date": "",
+      "issuer": "Professional Organization"
+    }
+  ]
+}

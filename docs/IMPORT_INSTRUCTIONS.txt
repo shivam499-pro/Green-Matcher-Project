@@ -1,0 +1,142 @@
+
+╔══════════════════════════════════════════════════════════════════════╗
+║           GREEN MATCHERS - RESUME IMPORT INSTRUCTIONS                ║
+╚══════════════════════════════════════════════════════════════════════╝
+
+📁 FILES GENERATED:
+------------------
+✅ resumes_database.json - Complete JSON database (15 resumes)
+✅ resume_01.txt through resume_15.txt - Individual text files
+✅ summary.txt - Statistics and overview
+
+📊 DATABASE STRUCTURE:
+---------------------
+Total Resumes: 15
+Languages: 8 (English, Hindi, Tamil, Telugu, Bengali, Marathi, Kannada, Punjabi)
+Experience Levels: Fresher, Entry-Level, Mid-Level, Senior
+Green Job Sectors: 13 different sectors
+
+🔧 STEP-BY-STEP IMPORT PROCESS:
+-------------------------------
+
+STEP 1: Setup Database Schema
+   → Copy the SQL schema from 'database_schema.sql' (generated below)
+   → Run it in your MariaDB database:
+     mysql -u green_user -p green_matchers < database_schema.sql
+
+STEP 2: Install Required Packages
+   → Make sure you have these in your requirements.txt:
+     - sentence-transformers
+     - googletrans==3.1.0a0
+     - sqlalchemy>=2.0
+
+STEP 3: Copy Import Code
+   → Add the import code to your backend (see import_resumes.py below)
+   → Place resumes_database.json in your backend directory
+
+STEP 4: Run Import Script
+   → From your backend directory:
+     python -c "from import_resumes import import_resumes_to_database; \
+                from database import SessionLocal; \
+                db = SessionLocal(); \
+                import_resumes_to_database(db, 'resumes_database.json')"
+
+STEP 5: Verify Import
+   → Check your database:
+     SELECT COUNT(*) FROM users;  -- Should show 15
+     SELECT COUNT(*) FROM resumes;  -- Should show 15
+     SELECT COUNT(*) FROM user_skills;  -- Should show 90+ skills
+
+🎯 FOR YOUR DEMO:
+----------------
+
+1. SEMANTIC SEARCH DEMO:
+   Search Query: "सौर पैनल लगाने का काम" (in Hindi)
+   Expected Results: Resume #1 (Rajesh Kumar - Solar Technician)
+                    Resume #12 (Neha Agarwal - Solar Sales)
+   
+2. LANGUAGE SWITCHING DEMO:
+   - Load Resume #2 (Priya - Wind Energy)
+   - Show it in: English → Tamil → Hindi → Telugu
+   
+3. SKILL MATCHING DEMO:
+   Job: "EV Charging Infrastructure Engineer"
+   Top Matches: Resume #4 (Sai Krishna - EV Installer)
+               Resume #13 (Kiran - EV Technician)
+
+4. DIVERSE PROFILES DEMO:
+   - Fresher: Priya (#2), Deepa (#8)
+   - Mid-Level: Rajesh (#1), Ananya (#5)
+   - Senior: Dr. Arjun (#3), Vikram (#6)
+
+📝 SAMPLE API ENDPOINTS TO CREATE:
+----------------------------------
+
+POST /api/resumes/import
+    → Import all resumes from JSON
+
+GET /api/resumes/search?query=solar+technician&language=hi
+    → Semantic search in Hindi
+
+GET /api/resumes/{id}?language=ta
+    → Get resume in Tamil
+
+POST /api/resumes/match
+    → Match resumes to job posting
+
+💡 TIPS FOR HACKATHON DEMO:
+---------------------------
+
+1. Pre-load all resumes before demo starts
+2. Have 3-4 sample searches ready to show
+3. Prepare one resume in all 6 languages
+4. Show vector similarity scores (e.g., 0.87, 0.92)
+5. Highlight multilingual capability prominently
+
+🐛 TROUBLESHOOTING:
+------------------
+
+Issue: Encoding errors
+Fix: Ensure all files use UTF-8 encoding
+
+Issue: Embedding generation slow
+Fix: Pre-generate embeddings during import, not at search time
+
+Issue: Translation API limits
+Fix: Cache translations or use local translation models
+
+Issue: Vector search not working
+Fix: Ensure MariaDB 10.11+ and proper BLOB storage for embeddings
+
+📚 USEFUL QUERIES FOR DEMO PREP:
+--------------------------------
+
+-- Get all resumes by language
+SELECT preferred_language, COUNT(*) 
+FROM users 
+GROUP BY preferred_language;
+
+-- Get resumes by experience level
+SELECT 
+    CASE 
+        WHEN experience_years = 0 THEN 'Fresher'
+        WHEN experience_years <= 2 THEN 'Entry-Level'
+        WHEN experience_years <= 7 THEN 'Mid-Level'
+        ELSE 'Senior'
+    END as level,
+    COUNT(*) as count
+FROM users
+GROUP BY level;
+
+-- Get most common skills
+SELECT skill_name, COUNT(*) as frequency
+FROM user_skills
+GROUP BY skill_name
+ORDER BY frequency DESC
+LIMIT 20;
+
+✨ YOU'RE ALL SET!
+-----------------
+Your resume database is ready for the hackathon demo.
+Good luck with Green Matchers! 🌱
+

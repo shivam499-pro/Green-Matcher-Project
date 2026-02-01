@@ -1,0 +1,55 @@
+
+Resume Database Summary
+=======================
+
+Total Resumes: 15
+Generated: 2026-02-01 16:45:45
+
+Language Distribution:
+---------------------
+Hindi: 3 resumes
+Tamil: 2 resumes
+English: 3 resumes
+Telugu: 2 resumes
+Bengali: 1 resumes
+Marathi: 2 resumes
+Kannada: 1 resumes
+Punjabi: 1 resumes
+
+Experience Level Distribution:
+-----------------------------
+Fresher: 2 resumes
+Entry Level: 3 resumes
+Mid Level: 5 resumes
+Senior: 5 resumes
+
+Job Sectors Covered:
+-------------------
+• Solar Energy
+• Wind Energy
+• Sustainability Consulting
+• EV Infrastructure
+• Waste Management
+• Green Building
+• Organic Farming
+• Water Conservation
+• Carbon Markets
+• Biogas
+• Environmental Compliance
+• Green Supply Chain
+• Renewable Energy Project Management
+
+Files Generated:
+---------------
+• resumes_database.json - Complete JSON database
+• resume_01_*.txt through resume_15_*.txt - Individual text files
+• summary.txt - This summary file
+
+Next Steps for Demo:
+-------------------
+1. Import resumes_database.json into your backend
+2. Process resumes to extract skills using your AI service
+3. Generate embeddings for semantic search
+4. Test multilingual search capabilities
+5. Demo the matching algorithm with different job postings
+

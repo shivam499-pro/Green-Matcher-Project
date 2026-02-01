@@ -1,0 +1,104 @@
+{
+  "$schema": "https://raw.githubusercontent.com/jsonresume/resume-schema/v1.0.0/schema.json",
+  "meta": {
+    "canonical": "https://greenmatchers.in/resume/7",
+    "version": "v1.0.0",
+    "lastModified": "2026-02-01T16:52:14.110303"
+  },
+  "basics": {
+    "name": "Ramesh Singh Yadav",
+    "label": "Organic Farming Consultant",
+    "email": "ramesh.yadav@email.com",
+    "phone": "+91 96543 21987",
+    "summary": "Agricultural expert with 7 years in organic farming and sustainable agriculture. Helped 500+ farmers transition to chemical-free farming.",
+    "location": {
+      "city": "Jaipur",
+      "countryCode": "IN",
+      "region": "Rajasthan"
+    },
+    "profiles": []
+  },
+  "work": [
+    {
+      "name": "Jaivik Krishi Pvt Ltd",
+      "position": "Senior Organic Farming Consultant",
+      "location": "Jaipur",
+      "startDate": "2020-05",
+      "endDate": "",
+      "summary": "Green jobs experience in organic farming consultant",
+      "highlights": [
+        "Trained 500+ farmers in organic techniques",
+        "Implemented organic certification for 100+ farms",
+        "Increased crop yields by 30%"
+      ]
+    }
+  ],
+  "education": [
+    {
+      "institution": "Rajasthan Agricultural University",
+      "area": "M.Sc. Agronomy",
+      "studyType": "Masters",
+      "startDate": "",
+      "endDate": "2017",
+      "gpa": ""
+    }
+  ],
+  "skills": [
+    {
+      "name": "Environmental & Sustainability",
+      "level": "Advanced",
+      "keywords": [
+        "Organic farming methods",
+        "Organic pest management"
+      ]
+    },
+    {
+      "name": "Management & Leadership",
+      "level": "Advanced",
+      "keywords": [
+        "Soil health management"
+      ]
+    },
+    {
+      "name": "Other Skills",
+      "level": "Advanced",
+      "keywords": [
+        "Composting and vermiculture",
+        "Water conservation techniques",
+        "Farmer training"
+      ]
+    }
+  ],
+  "languages": [
+    {
+      "language": "Hindi",
+      "fluency": "Native speaker"
+    },
+    {
+      "language": "English",
+      "fluency": "Conversational"
+    }
+  ],
+  "interests": [
+    {
+      "name": "Sustainability",
+      "keywords": [
+        "Green Energy",
+        "Environmental Conservation",
+        "Climate Action"
+      ]
+    }
+  ],
+  "certificates": [
+    {
+      "name": "Organic Farming Certification (APEDA)",
+      "date": "",
+      "issuer": "Agricultural and Processed Food Products Export Development Authority"
+    },
+    {
+      "name": "Integrated Pest Management",
+      "date": "",
+      "issuer": "Professional Organization"
+    }
+  ]
+}

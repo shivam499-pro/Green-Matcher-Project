@@ -1,60 +1,72 @@
 """
 Green Matchers - Analytics Routes
+API endpoints for analytics and insights.
 """
-from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy.orm import Session, func
-from typing import List
-from core.deps import DatabaseSession, get_current_user, require_admin
-from models.user import User, UserRole
+from fastapi import APIRouter, Depends, HTTPException, Query
+from sqlalchemy.orm import Session
+from typing import List, Optional
+from datetime import datetime, timedelta
+
+from core.deps import get_db, get_current_user
+from models.analytics import Analytics
 from models.job import Job
 from models.career import Career
 from models.application import Application
+from models.user import User
 from schemas.analytics import (
     CareerDemand,
     SkillPopularity,
     SalaryRange,
     SDGDistribution,
     AnalyticsOverview,
-    CareerDemandQuery,
-    SkillPopularityQuery,
-    SalaryRangeQuery,
+    AnalyticsResponse
 )
 
-router = APIRouter()
+router = APIRouter(prefix="/analytics", tags=["Analytics"])
+
+
+# SDG Goals mapping
+SDG_GOALS = {
+    1: "No Poverty",
+    2: "Zero Hunger",
+    3: "Good Health and Well-being",
+    4: "Quality Education",
+    5: "Gender Equality",
+    6: "Clean Water and Sanitation",
+    7: "Affordable and Clean Energy",
+    8: "Decent Work and Economic Growth",
+    9: "Industry, Innovation and Infrastructure",
+    10: "Reduced Inequalities",
+    11: "Sustainable Cities and Communities",
+    12: "Responsible Consumption and Production",
+    13: "Climate Action",
+    14: "Life Below Water",
+    15: "Life on Land",
+    16: "Peace, Justice and Strong Institutions",
+    17: "Partnerships for the Goals"
+}
 
 
 @router.get("/overview", response_model=AnalyticsOverview)
-def get_analytics_overview(
-    current_user: dict = Depends(get_current_user),
-    db: DatabaseSession = Depends()
+async def get_analytics_overview(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
 ):
     """
-    Get analytics overview (admin only).
+    Get analytics overview with key metrics.
     """
-    # Verify user is an admin
-    user = db.query(User).filter(User.id == int(current_user["user_id"])).first()
-    if user.role.value != "ADMIN":
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Only admins can view analytics"
-        )
+    # Total counts
+    total_users = db.query(User).filter(User.role == "USER").count()
+    total_jobs = db.query(Job).count()
+    total_careers = db.query(Career).count()
+    total_applications = db.query(Application).count()
     
-    # Calculate overview metrics
-    total_users = db.query(func.count(User.id)).scalar()
-    total_jobs = db.query(func.count(Job.id)).scalar()
-    total_careers = db.query(func.count(Career.id)).scalar()
-    total_applications = db.query(func.count(Application.id)).scalar()
-    verified_companies = db.query(func.count(User.id)).filter(
-        User.role == UserRole.EMPLOYER,
-        User.is_verified == 1
-    ).scalar()
+    # Verified companies (employers with verified jobs)
+    verified_companies = db.query(Job.employer_id).filter(Job.is_verified == True).distinct().count()
     
     # Active jobs in last 30 days
-    from datetime import datetime, timedelta
     thirty_days_ago = datetime.utcnow() - timedelta(days=30)
-    active_jobs_last_30_days = db.query(func.count(Job.id)).filter(
-        Job.created_at >= thirty_days_ago
-    ).scalar()
+    active_jobs_last_30_days = db.query(Job).filter(Job.created_at >= thirty_days_ago).count()
     
     return AnalyticsOverview(
         total_users=total_users,
@@ -67,192 +79,227 @@ def get_analytics_overview(
 
 
 @router.get("/career-demand", response_model=List[CareerDemand])
-def get_career_demand(
-    limit: int = 10,
-    current_user: dict = Depends(get_current_user),
-    db: DatabaseSession = Depends()
+async def get_career_demand(
+    limit: int = Query(10, ge=1, le=50),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
 ):
     """
-    Get career demand analytics (admin only).
+    Get career demand analytics based on applications and job postings.
+    Demand score = (application_count * 0.6) + (job_count * 0.4)
     """
-    # Verify user is an admin
-    user = db.query(User).filter(User.id == int(current_user["user_id"])).first()
-    if user.role.value != "ADMIN":
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Only admins can view analytics"
-        )
-    
-    # Calculate demand score for each career
     careers = db.query(Career).all()
-    career_demand_list = []
+    results = []
     
     for career in careers:
-        # Count applications for jobs in this career
-        job_ids = [job.id for job in career.jobs]
-        application_count = db.query(func.count(Application.id)).filter(
-            Application.job_id.in_(job_ids)
-        ).scalar()
+        # Count applications for this career
+        application_count = db.query(Application).join(Job).filter(Job.career_id == career.id).count()
         
-        # Calculate demand score
-        job_count = len(career.jobs)
-        demand_score = (application_count / job_count * 100) if job_count > 0 else 0.0
+        # Count jobs for this career
+        job_count = db.query(Job).filter(Job.career_id == career.id).count()
         
-        career_demand_list.append(CareerDemand(
+        # Calculate demand score (normalized to 0-100)
+        max_apps = max(application_count, 1)
+        max_jobs = max(job_count, 1)
+        demand_score = min(100, (application_count / max_apps * 60) + (job_count / max_jobs * 40))
+        
+        results.append(CareerDemand(
             career_id=career.id,
             career_title=career.title,
-            demand_score=demand_score,
+            demand_score=round(demand_score, 2),
             application_count=application_count,
             job_count=job_count
         ))
     
     # Sort by demand score and limit
-    career_demand_list.sort(key=lambda x: x.demand_score, reverse=True)
-    return career_demand_list[:limit]
+    results.sort(key=lambda x: x.demand_score, reverse=True)
+    return results[:limit]
 
 
 @router.get("/skill-popularity", response_model=List[SkillPopularity])
-def get_skill_popularity(
-    limit: int = 20,
-    current_user: dict = Depends(get_current_user),
-    db: DatabaseSession = Depends()
+async def get_skill_popularity(
+    limit: int = Query(20, ge=1, le=100),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
 ):
     """
-    Get skill popularity analytics (admin only).
+    Get skill popularity analytics based on user profiles and job requirements.
     """
-    # Verify user is an admin
-    user = db.query(User).filter(User.id == int(current_user["user_id"])).first()
-    if user.role.value != "ADMIN":
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Only admins can view analytics"
-        )
-    
-    # Count skill occurrences in user profiles
+    # Extract skills from user profiles
+    users = db.query(User).filter(User.role == "USER", User.skills.isnot(None)).all()
     skill_counts = {}
-    users = db.query(User).filter(User.skills.isnot(None)).all()
     
     for user in users:
         if user.skills:
-            for skill in user.skills:
-                skill_counts[skill] = skill_counts.get(skill, 0) + 1
+            skills = user.skills if isinstance(user.skills, list) else user.skills.split(",")
+            for skill in skills:
+                skill = skill.strip().lower()
+                if skill:
+                    skill_counts[skill] = skill_counts.get(skill, 0) + 1
     
-    # Convert to list and sort
-    skill_popularity_list = [
-        SkillPopularity(
+    # Convert to list and determine trends
+    results = []
+    for skill, count in skill_counts.items():
+        # Simple trend logic (in real app, compare with historical data)
+        trend = "stable"
+        if count > 5:
+            trend = "up"
+        elif count < 2:
+            trend = "down"
+        
+        results.append(SkillPopularity(
             skill=skill,
             count=count,
-            trend="stable"  # Simplified for now
-        )
-        for skill, count in sorted(skill_counts.items(), key=lambda x: x[1], reverse=True)
-    ]
+            trend=trend
+        ))
     
-    return skill_popularity_list[:limit]
+    # Sort by count and limit
+    results.sort(key=lambda x: x.count, reverse=True)
+    return results[:limit]
 
 
 @router.get("/salary-ranges", response_model=List[SalaryRange])
-def get_salary_ranges(
-    career_id: int = None,
-    limit: int = 20,
-    current_user: dict = Depends(get_current_user),
-    db: DatabaseSession = Depends()
+async def get_salary_ranges(
+    career_id: Optional[int] = Query(None),
+    limit: int = Query(20, ge=1, le=50),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
 ):
     """
-    Get salary range analytics (admin only).
+    Get salary range analytics by career.
     """
-    # Verify user is an admin
-    user = db.query(User).filter(User.id == int(current_user["user_id"])).first()
-    if user.role.value != "ADMIN":
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Only admins can view analytics"
-        )
-    
-    # Get careers with salary data
-    query = db.query(Career).filter(
-        Career.avg_salary_min.isnot(None),
-        Career.avg_salary_max.isnot(None)
-    )
+    query = db.query(Job).filter(Job.salary_min.isnot(None), Job.salary_max.isnot(None))
     
     if career_id:
-        query = query.filter(Career.id == career_id)
+        query = query.filter(Job.career_id == career_id)
     
-    careers = query.limit(limit).all()
+    jobs = query.all()
     
-    # Calculate salary ranges
-    salary_range_list = []
-    for career in careers:
-        job_count = len(career.jobs)
-        avg_salary = (career.avg_salary_min + career.avg_salary_max) / 2 if career.avg_salary_min and career.avg_salary_max else 0
+    # Group by career
+    career_salaries = {}
+    for job in jobs:
+        cid = job.career_id or 0
+        if cid not in career_salaries:
+            career_salaries[cid] = []
+        career_salaries[cid].append((job.salary_min, job.salary_max))
+    
+    results = []
+    for cid, salaries in career_salaries.items():
+        # Calculate stats
+        min_salary = min(s[0] for s in salaries)
+        max_salary = max(s[1] for s in salaries)
+        avg_salary = sum((s[0] + s[1]) / 2 for s in salaries) / len(salaries)
         
-        salary_range_list.append(SalaryRange(
-            career_id=career.id,
-            career_title=career.title,
-            min_salary=career.avg_salary_min or 0,
-            max_salary=career.avg_salary_max or 0,
-            avg_salary=avg_salary,
-            job_count=job_count
+        # Get career title
+        career = db.query(Career).filter(Career.id == cid).first()
+        career_title = career.title if career else "Other"
+        
+        results.append(SalaryRange(
+            career_id=cid,
+            career_title=career_title,
+            min_salary=min_salary,
+            max_salary=max_salary,
+            avg_salary=round(avg_salary, 2),
+            job_count=len(salaries)
         ))
     
-    return salary_range_list
+    # Sort by average salary and limit
+    results.sort(key=lambda x: x.avg_salary, reverse=True)
+    return results[:limit]
 
 
 @router.get("/sdg-distribution", response_model=List[SDGDistribution])
-def get_sdg_distribution(
-    current_user: dict = Depends(get_current_user),
-    db: DatabaseSession = Depends()
+async def get_sdg_distribution(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
 ):
     """
-    Get SDG goal distribution (admin only).
+    Get SDG goal distribution across all jobs.
     """
-    # Verify user is an admin
-    user = db.query(User).filter(User.id == int(current_user["user_id"])).first()
-    if user.role.value != "ADMIN":
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Only admins can view analytics"
-        )
-    
-    # Count SDG tags in jobs
-    sdg_counts = {}
     jobs = db.query(Job).filter(Job.sdg_tags.isnot(None)).all()
-    total_jobs = len(jobs)
+    sdg_counts = {}
     
     for job in jobs:
         if job.sdg_tags:
-            for sdg in job.sdg_tags:
-                sdg_counts[sdg] = sdg_counts.get(sdg, 0) + 1
+            tags = job.sdg_tags if isinstance(job.sdg_tags, list) else []
+            for tag in tags:
+                sdg_counts[tag] = sdg_counts.get(tag, 0) + 1
     
-    # SDG goal names
-    sdg_names = {
-        1: "No Poverty",
-        2: "Zero Hunger",
-        3: "Good Health",
-        4: "Quality Education",
-        5: "Gender Equality",
-        6: "Clean Water",
-        7: "Clean Energy",
-        8: "Decent Work",
-        9: "Industry Innovation",
-        10: "Reduced Inequalities",
-        11: "Sustainable Cities",
-        12: "Responsible Consumption",
-        13: "Climate Action",
-        14: "Life Below Water",
-        15: "Life on Land",
-        16: "Peace & Justice",
-        17: "Partnerships"
-    }
+    total = sum(sdg_counts.values()) or 1
+    results = []
     
-    # Convert to list
-    sdg_distribution_list = [
-        SDGDistribution(
-            sdg_goal=sdg,
-            sdg_name=sdg_names.get(sdg, f"SDG {sdg}"),
+    for sdg_num, count in sorted(sdg_counts.items()):
+        results.append(SDGDistribution(
+            sdg_goal=sdg_num,
+            sdg_name=SDG_GOALS.get(sdg_num, f"SDG {sdg_num}"),
             count=count,
-            percentage=(count / total_jobs * 100) if total_jobs > 0 else 0
-        )
-        for sdg, count in sorted(sdg_counts.items(), key=lambda x: x[1], reverse=True)
-    ]
+            percentage=round((count / total) * 100, 2)
+        ))
     
-    return sdg_distribution_list
+    return results
+
+
+@router.get("/metrics/{metric_name}", response_model=AnalyticsResponse)
+async def get_analytics_metric(
+    metric_name: str,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Get a specific analytics metric by name.
+    """
+    metric = db.query(Analytics).filter(Analytics.metric_name == metric_name).first()
+    
+    if not metric:
+        raise HTTPException(status_code=404, detail="Metric not found")
+    
+    return AnalyticsResponse(
+        metric_name=metric.metric_name,
+        data=metric.metric_value,
+        computed_at=metric.computed_at
+    )
+
+
+@router.post("/metrics/{metric_name}/recompute")
+async def recompute_analytics_metric(
+    metric_name: str,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Recompute and store an analytics metric.
+    """
+    # Only allow admins to recompute
+    if current_user.role != "ADMIN":
+        raise HTTPException(status_code=403, detail="Only admins can recompute metrics")
+    
+    # Compute the metric based on type
+    data = None
+    
+    if metric_name == "career_demand":
+        data = await get_career_demand(limit=50, db=db, current_user=current_user)
+    elif metric_name == "skill_popularity":
+        data = await get_skill_popularity(limit=100, db=db, current_user=current_user)
+    elif metric_name == "salary_ranges":
+        data = await get_salary_ranges(limit=50, db=db, current_user=current_user)
+    elif metric_name == "sdg_distribution":
+        data = await get_sdg_distribution(db=db, current_user=current_user)
+    else:
+        raise HTTPException(status_code=400, detail="Unknown metric name")
+    
+    # Store or update the metric
+    existing = db.query(Analytics).filter(Analytics.metric_name == metric_name).first()
+    
+    if existing:
+        existing.metric_value = [d.model_dump() for d in data] if hasattr(data, '__iter__') else data
+        existing.computed_at = datetime.utcnow()
+    else:
+        new_metric = Analytics(
+            metric_name=metric_name,
+            metric_value=[d.model_dump() for d in data] if hasattr(data, '__iter__') else data
+        )
+        db.add(new_metric)
+    
+    db.commit()
+    
+    return {"message": f"Metric '{metric_name}' recomputed successfully"}

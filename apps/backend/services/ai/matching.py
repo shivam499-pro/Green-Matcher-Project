@@ -268,6 +268,80 @@ class MatchingService:
             })
         
         return recommendations
+    
+    def get_job_recommendations(
+        self,
+        db: Session,
+        user: User,
+        limit: int = 10
+    ) -> List[Dict]:
+        """
+        Get job recommendations for a user based on their skills.
+        
+        Args:
+            db: Database session
+            user: User object
+            limit: Maximum number of recommendations
+            
+        Returns:
+            List[Dict]: List of job recommendation dictionaries
+        """
+        if not user.skills or len(user.skills) == 0:
+            logger.warning(f"User {user.id} has no skills to match")
+            return []
+        
+        from models.job import Job
+        
+        # Get user skill embedding
+        user_embedding = self.embedding_service.encode_user_skills(user.skills)
+        
+        # Get all active jobs
+        jobs = db.query(Job).filter(Job.is_active == True).all()
+        
+        if not jobs:
+            logger.warning("No active jobs found in database")
+            return []
+        
+        # Calculate similarities
+        recommendations = []
+        for job in jobs:
+            # Parse job embedding from JSON
+            job_embedding = self.embedding_service.json_to_vector(job.embedding)
+            
+            # Calculate similarity
+            similarity = self.embedding_service.cosine_similarity(
+                user_embedding, 
+                job_embedding
+            )
+            
+            # Filter by minimum similarity
+            if similarity >= 0.3:
+                # Find matched and missing skills
+                matched, missing = self._compare_skills(
+                    user.skills, 
+                    job.required_skills
+                )
+                
+                recommendations.append({
+                    "job_id": job.id,
+                    "title": job.title,
+                    "description": job.description,
+                    "company_name": job.company_name,
+                    "location": job.location,
+                    "salary_min": job.salary_min,
+                    "salary_max": job.salary_max,
+                    "similarity_score": round(similarity, 3),
+                    "matched_skills": matched,
+                    "missing_skills": missing,
+                    "required_skills": job.required_skills,
+                    "sdg_tags": job.sdg_tags
+                })
+        
+        # Sort by similarity (descending)
+        recommendations.sort(key=lambda x: x["similarity_score"], reverse=True)
+        
+        # Return top matches
+        return recommendations[:limit]
 
 
 # Singleton instance for dependency injection

@@ -1,0 +1,103 @@
+{
+  "$schema": "https://raw.githubusercontent.com/jsonresume/resume-schema/v1.0.0/schema.json",
+  "meta": {
+    "canonical": "https://greenmatchers.in/resume/13",
+    "version": "v1.0.0",
+    "lastModified": "2026-02-01T16:52:14.112709"
+  },
+  "basics": {
+    "name": "Kiran Kumar Reddy",
+    "label": "Electric Vehicle Technician",
+    "email": "kiran.reddy@email.com",
+    "phone": "+91 98123 45678",
+    "summary": "EV technician with 4 years in electric vehicle maintenance and battery management. Certified in EV diagnostics and high-voltage systems.",
+    "location": {
+      "city": "Vijayawada",
+      "countryCode": "IN",
+      "region": "Andhra Pradesh"
+    },
+    "profiles": []
+  },
+  "work": [
+    {
+      "name": "Ather Energy",
+      "position": "Senior EV Technician",
+      "location": "Vijayawada",
+      "startDate": "2021-09",
+      "endDate": "",
+      "summary": "Green jobs experience in electric vehicle technician",
+      "highlights": [
+        "Diagnosed and repaired 500+ electric scooters",
+        "Performed battery health assessments",
+        "Maintained 95% first-time-fix rate"
+      ]
+    }
+  ],
+  "education": [
+    {
+      "institution": "SBTET AP",
+      "area": "Diploma Automobile Engineering",
+      "studyType": "Diploma",
+      "startDate": "",
+      "endDate": "2020",
+      "gpa": ""
+    }
+  ],
+  "skills": [
+    {
+      "name": "Technical Skills",
+      "level": "Advanced",
+      "keywords": [
+        "EV diagnostics and repair",
+        "Electric motor maintenance"
+      ]
+    },
+    {
+      "name": "Management & Leadership",
+      "level": "Advanced",
+      "keywords": [
+        "Battery management systems"
+      ]
+    },
+    {
+      "name": "Other Skills",
+      "level": "Advanced",
+      "keywords": [
+        "High-voltage safety",
+        "Charging system troubleshooting"
+      ]
+    }
+  ],
+  "languages": [
+    {
+      "language": "Telugu",
+      "fluency": "Native speaker"
+    },
+    {
+      "language": "English",
+      "fluency": "Conversational"
+    }
+  ],
+  "interests": [
+    {
+      "name": "Sustainability",
+      "keywords": [
+        "Green Energy",
+        "Environmental Conservation",
+        "Climate Action"
+      ]
+    }
+  ],
+  "certificates": [
+    {
+      "name": "EV Technician Certification (Level 2)",
+      "date": "",
+      "issuer": "Professional Organization"
+    },
+    {
+      "name": "High Voltage Safety Training",
+      "date": "",
+      "issuer": "Professional Organization"
+    }
+  ]
+}

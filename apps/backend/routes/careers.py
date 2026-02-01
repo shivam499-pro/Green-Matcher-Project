@@ -14,12 +14,12 @@ router = APIRouter()
 
 @router.get("", response_model=List[CareerResponse])
 def list_careers(
+    db: DatabaseSession,
     search: Optional[str] = None,
     sdg_tag: Optional[int] = None,
     skill: Optional[str] = None,
     skip: int = 0,
-    limit: int = 20,
-    db: DatabaseSession = Depends()
+    limit: int = 20
 ):
     """
     List careers with optional filters.
@@ -46,7 +46,7 @@ def list_careers(
 
 
 @router.get("/{career_id}", response_model=CareerDetailResponse)
-def get_career(career_id: int, db: DatabaseSession = Depends()):
+def get_career(career_id: int, db: DatabaseSession):
     """
     Get career details by ID.
     """
@@ -78,8 +78,8 @@ def get_career(career_id: int, db: DatabaseSession = Depends()):
 @router.post("", response_model=CareerResponse, status_code=status.HTTP_201_CREATED)
 def create_career(
     career_data: CareerCreate,
-    current_user: dict = Depends(get_current_user),
-    db: DatabaseSession = Depends()
+    db: DatabaseSession,
+    current_user: dict = Depends(get_current_user)
 ):
     """
     Create a new career (admin only).
@@ -114,8 +114,8 @@ def create_career(
 def update_career(
     career_id: int,
     career_update: CareerUpdate,
-    current_user: dict = Depends(get_current_user),
-    db: DatabaseSession = Depends()
+    db: DatabaseSession,
+    current_user: dict = Depends(get_current_user)
 ):
     """
     Update a career (admin only).
@@ -160,8 +160,8 @@ def update_career(
 @router.delete("/{career_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_career(
     career_id: int,
-    current_user: dict = Depends(get_current_user),
-    db: DatabaseSession = Depends()
+    db: DatabaseSession,
+    current_user: dict = Depends(get_current_user)
 ):
     """
     Delete a career (admin only).

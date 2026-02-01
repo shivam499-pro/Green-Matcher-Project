@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useI18n } from '../contexts/I18nContext';
+
 import { recommendationsAPI } from '../utils/api';
 
 const Recommendations = () => {
-  const { t } = useI18n();
+  
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [recommendations, setRecommendations] = useState([]);
@@ -48,7 +48,7 @@ const Recommendations = () => {
     return (
       <div className="flex-1 flex items-center justify-center bg-gray-50">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600 mx-auto"></div>
           <p className="mt-4 text-gray-600">{t('common.loading') || 'Loading...'}</p>
         </div>
       </div>
@@ -61,37 +61,37 @@ const Recommendations = () => {
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900">
-            {t('recommendations.title') || 'Career Recommendations'}
+            {t('Career Recommendations')}
           </h1>
           <p className="mt-2 text-gray-600">
-            {t('recommendations.subtitle') || 'AI-powered career paths matched to your skills'}
+            {t('Personalized career paths based on your skills and interests.')}
           </p>
         </div>
 
         {/* Error */}
         {error && (
-          <div className="mb-6 p-4 bg-red-50 text-red-800 rounded-lg">
+          <div className="mb-6 p-4 bg-red-50 text-red-800 rounded-lg border border-red-200">
             {error}
           </div>
         )}
 
         {/* No Recommendations */}
         {recommendations.length === 0 && !error && (
-          <div className="bg-white rounded-xl shadow-sm p-12 text-center">
+          <div className="bg-white rounded-lg p-12 text-center border border-gray-200">
             <svg className="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
             </svg>
             <h3 className="text-xl font-semibold text-gray-900 mb-2">
-              {t('recommendations.noRecommendations') || 'No recommendations yet'}
+              {t('No Recommendations Found')}
             </h3>
             <p className="text-gray-600 mb-6">
-              {t('recommendations.noRecommendationsHint') || 'Add your skills to get personalized career recommendations'}
+              {t('Add your skills to get personalized career recommendations.')}
             </p>
             <button
               onClick={() => navigate('/profile')}
-              className="px-6 py-3 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition"
+              className="px-6 py-3 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors"
             >
-              {t('recommendations.updateProfile') || 'Update Your Profile'}
+              {t('Update Your Profile')}
             </button>
           </div>
         )}
@@ -102,7 +102,7 @@ const Recommendations = () => {
             {recommendations.map((rec) => (
               <div
                 key={rec.career.id}
-                className="bg-white rounded-xl shadow-sm hover:shadow-md transition overflow-hidden"
+                className="bg-white rounded-lg border border-gray-200 hover:border-emerald-500 transition-colors overflow-hidden"
               >
                 {/* Header */}
                 <div className="p-6">
@@ -145,7 +145,7 @@ const Recommendations = () => {
                   {/* Skills */}
                   <div className="mb-4">
                     <h4 className="text-sm font-medium text-gray-700 mb-2">
-                      {t('recommendations.requiredSkills') || 'Required Skills'}
+                      {t('Required Skills')}
                     </h4>
                     <div className="flex flex-wrap gap-1">
                       {rec.career.required_skills.slice(0, 5).map((skill) => (
@@ -172,7 +172,7 @@ const Recommendations = () => {
                   {rec.missing_skills && rec.missing_skills.length > 0 && (
                     <div className="mb-4 p-3 bg-orange-50 rounded-lg">
                       <h4 className="text-sm font-medium text-orange-800 mb-2">
-                        {t('recommendations.skillsToLearn') || 'Skills to Learn'}
+                        {t('Skills to Learn')}
                       </h4>
                       <div className="flex flex-wrap gap-1">
                         {rec.missing_skills.slice(0, 3).map((skill) => (
@@ -196,11 +196,11 @@ const Recommendations = () => {
                   {rec.career.demand_score && (
                     <div className="flex items-center text-sm">
                       <span className="text-gray-600 mr-2">
-                        {t('recommendations.demandScore') || 'Demand Score'}:
+                        {t('Demand Score')}:
                       </span>
                       <div className="flex-1 bg-gray-200 rounded-full h-2 mr-2">
                         <div
-                          className="bg-primary-500 h-2 rounded-full"
+                          className="bg-emerald-600 h-2 rounded-full"
                           style={{ width: `${rec.career.demand_score * 100}%` }}
                         />
                       </div>
@@ -215,9 +215,9 @@ const Recommendations = () => {
                 <div className="px-6 py-4 bg-gray-50 border-t border-gray-200">
                   <button
                     onClick={() => navigate(`/careers/${rec.career.id}`)}
-                    className="w-full px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition text-sm font-medium"
+                    className="w-full px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors text-sm font-medium"
                   >
-                    {t('recommendations.viewDetails') || 'View Details'}
+                    {t('View Details')}
                   </button>
                 </div>
               </div>
@@ -230,9 +230,9 @@ const Recommendations = () => {
           <div className="mt-8 text-center">
             <button
               onClick={() => navigate('/careers')}
-              className="text-primary-600 hover:text-primary-700 font-medium"
+              className="text-emerald-600 hover:text-emerald-700 font-medium"
             >
-              {t('recommendations.viewAllCareers') || 'View All Careers →'}
+              {t('View All Careers')}
             </button>
           </div>
         )}

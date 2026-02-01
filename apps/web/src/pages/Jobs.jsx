@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useI18n } from '../contexts/I18nContext';
+
 import { jobsAPI, savedJobsAPI } from '../utils/api';
 
 const Jobs = () => {
-  const { t } = useI18n();
+  
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [jobs, setJobs] = useState([]);
@@ -68,11 +68,11 @@ const Jobs = () => {
   const handleSaveJob = async (jobId) => {
     try {
       await savedJobsAPI.saveJob(jobId);
-      setError({ type: 'success', text: t('jobs.saveSuccess') || 'Job saved successfully!' });
+      setError({ type: 'success', text: t('Job saved successfully!') });
       setTimeout(() => setError(null), 3000);
     } catch (error) {
       console.error('Error saving job:', error);
-      setError({ type: 'error', text: t('jobs.saveError') || 'Failed to save job' });
+      setError({ type: 'error', text: t('Failed to save job') });
     }
   };
 
@@ -104,11 +104,11 @@ const Jobs = () => {
 
   return (
     <div className="flex-1 bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-7xl mx-auto">
+      <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900">
-            {t('jobs.title') || 'Green Jobs'}
+            {t('Green Jobs')}
           </h1>
           <p className="mt-2 text-gray-600">
             {t('jobs.subtitle') || 'Find your next opportunity in the green economy'}
@@ -116,7 +116,7 @@ const Jobs = () => {
         </div>
 
         {/* Search Bar */}
-        <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
+        <div className="bg-white rounded-lg p-6 mb-6 border border-gray-200">
           <form onSubmit={handleSearch} className="flex flex-col sm:flex-row gap-4">
             <div className="flex-1 relative">
               <input
@@ -124,7 +124,7 @@ const Jobs = () => {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder={t('jobs.searchPlaceholder') || 'Search jobs by title, skills, or keywords...'}
-                className="w-full px-4 py-3 pl-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                className="w-full px-4 py-3 pl-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
               />
               <svg className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -132,16 +132,16 @@ const Jobs = () => {
             </div>
             <button
               type="submit"
-              className="px-6 py-3 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition font-medium"
+              className="px-6 py-3 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors font-medium"
             >
-              {t('jobs.search') || 'Search'}
+              {t('Search')}
             </button>
             <button
               type="button"
               onClick={() => setShowFilters(!showFilters)}
-              className="px-6 py-3 bg-white text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition font-medium"
+              className="px-6 py-3 bg-white text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors font-medium"
             >
-              {t('jobs.filters') || 'Filters'}
+              {t('Filters')}
             </button>
           </form>
 
@@ -152,7 +152,7 @@ const Jobs = () => {
                 {/* Location Filter */}
                 <div>
                   <label htmlFor="location" className="block text-sm font-medium text-gray-700 mb-2">
-                    {t('jobs.location') || 'Location'}
+                    {t('Location')}
                   </label>
                   <input
                     type="text"
@@ -161,7 +161,7 @@ const Jobs = () => {
                     value={filters.location}
                     onChange={handleFilterChange}
                     placeholder={t('jobs.locationPlaceholder') || 'e.g., Mumbai, Delhi'}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
                   />
                 </div>
 
@@ -177,23 +177,23 @@ const Jobs = () => {
                     value={filters.salary_min}
                     onChange={handleFilterChange}
                     placeholder="e.g., 500000"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
                   />
                 </div>
 
                 {/* SDG Tag Filter */}
                 <div>
                   <label htmlFor="sdg_tag" className="block text-sm font-medium text-gray-700 mb-2">
-                    {t('jobs.sdgTag') || 'SDG Tag'}
+                    {t( 'SDG Tag')}
                   </label>
                   <select
                     id="sdg_tag"
                     name="sdg_tag"
                     value={filters.sdg_tag}
                     onChange={handleFilterChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
                   >
-                    <option value="">{t('jobs.allSDGs') || 'All SDGs'}</option>
+                    <option value="">{t('All SDGs')}</option>
                     {sdgTags.map(sdg => (
                       <option key={sdg} value={sdg}>{sdg}</option>
                     ))}
@@ -206,9 +206,9 @@ const Jobs = () => {
                 <button
                   type="button"
                   onClick={clearFilters}
-                  className="text-sm text-primary-600 hover:text-primary-700 font-medium"
+                  className="text-sm text-emerald-600 hover:text-emerald-700 font-medium"
                 >
-                  {t('jobs.clearFilters') || 'Clear Filters'}
+                  {t('Clear Filters')}
                 </button>
               </div>
             </div>
@@ -217,7 +217,7 @@ const Jobs = () => {
 
         {/* Error */}
         {error && (
-          <div className="mb-6 p-4 bg-red-50 text-red-800 rounded-lg">
+          <div className="mb-6 p-4 bg-red-50 text-red-800 rounded-lg border border-red-200">
             {error}
           </div>
         )}
@@ -225,21 +225,21 @@ const Jobs = () => {
         {/* Loading */}
         {loading && (
           <div className="flex items-center justify-center py-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600"></div>
           </div>
         )}
 
         {/* No Results */}
         {!loading && jobs.length === 0 && !error && (
-          <div className="bg-white rounded-xl shadow-sm p-12 text-center">
+          <div className="bg-white rounded-lg p-12 text-center border border-gray-200">
             <svg className="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
             <h3 className="text-xl font-semibold text-gray-900 mb-2">
-              {t('jobs.noJobs') || 'No jobs found'}
+              {t('No jobs found')}
             </h3>
             <p className="text-gray-600">
-              {t('jobs.noJobsHint') || 'Try adjusting your search or filters'}
+              {t('Try adjusting your search or filters')}
             </p>
           </div>
         )}
@@ -250,7 +250,7 @@ const Jobs = () => {
             {jobs.map((job) => (
               <div
                 key={job.id}
-                className="bg-white rounded-xl shadow-sm hover:shadow-md transition p-6 cursor-pointer"
+                className="bg-white rounded-lg border border-gray-200 hover:border-emerald-500 transition-colors p-6 cursor-pointer"
                 onClick={() => navigate(`/jobs/${job.id}`)}
               >
                 <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
@@ -266,7 +266,7 @@ const Jobs = () => {
                           <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
                             <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                           </svg>
-                          {t('jobs.verified') || 'Verified'}
+                          {t('Verified')}
                         </span>
                       )}
                     </div>
@@ -319,16 +319,16 @@ const Jobs = () => {
                         e.stopPropagation();
                         handleSaveJob(job.id);
                       }}
-                      className="px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition text-sm font-medium"
-                      title={t('jobs.saveJob') || 'Save Job'}
+                      className="px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition-colors text-sm font-medium"
+                      title={t('Save Job')}
                     >
                       <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
                       </svg>
-                      {t('jobs.save') || 'Save'}
+                      {t('Save')}
                     </button>
-                    <button className="px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition text-sm font-medium">
-                      {t('jobs.viewDetails') || 'View Details'}
+                    <button className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors text-sm font-medium">
+                      {t('View Details')}
                     </button>
                   </div>
                 </div>
