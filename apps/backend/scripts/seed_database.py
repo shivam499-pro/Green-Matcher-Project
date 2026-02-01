@@ -1,11 +1,11 @@
 """
 Green Matchers - Database Seeding Script
-Populates the database with demo data for hackathon demo.
+Populates database with demo data for hackathon demo.
 """
 import sys
 import os
 
-# Add the parent directory to the path
+# Add parent directory to path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from sqlalchemy.orm import Session
@@ -104,15 +104,14 @@ def seed_careers(db: Session):
             "avg_salary_max": 900000
         }
     ]
-
+    
     for career_data in careers_data:
         career = Career(**career_data)
         db.add(career)
-
+    
     db.commit()
     print(f"✅ Seeded {len(careers_data)} careers")
-
-
+    
 def seed_users(db: Session):
     """Seed users table with demo users."""
     users_data = [
@@ -164,15 +163,14 @@ def seed_users(db: Session):
             "language": "en"
         }
     ]
-
+    
     for user_data in users_data:
         user = User(**user_data)
         db.add(user)
-
+    
     db.commit()
     print(f"✅ Seeded {len(users_data)} users")
-
-
+    
 def seed_jobs(db: Session):
     """Seed jobs table with demo jobs."""
     # Get employers
@@ -184,7 +182,7 @@ def seed_jobs(db: Session):
     if not employers or not careers:
         print("⚠️  No employers or careers found. Please seed users and careers first.")
         return
-
+    
     jobs_data = [
         {
             "employer_id": employers[0].id,
@@ -295,25 +293,24 @@ def seed_jobs(db: Session):
             "is_verified": True
         }
     ]
-
+    
     for job_data in jobs_data:
         job = Job(**job_data)
         db.add(job)
-
+    
     db.commit()
     print(f"✅ Seeded {len(jobs_data)} jobs")
-
-
+    
 def seed_applications(db: Session):
     """Seed applications table with demo applications."""
     # Get job seekers and jobs
     job_seekers = db.query(User).filter(User.role == "USER").all()
     jobs = db.query(Job).limit(5).all()
-
+    
     if not job_seekers or not jobs:
         print("⚠️  No job seekers or jobs found. Please seed users and jobs first.")
         return
-
+    
     applications_data = []
     for i, job in enumerate(jobs):
         # Create applications from different job seekers
@@ -325,15 +322,14 @@ def seed_applications(db: Session):
             "cover_letter": f"I am very interested in this position at {job.title}. My skills align well with the requirements."
         }
         applications_data.append(application)
-
+    
     for app_data in applications_data:
         application = Application(**app_data)
         db.add(application)
-
+    
     db.commit()
     print(f"✅ Seeded {len(applications_data)} applications")
-
-
+    
 def seed_analytics(db: Session):
     """Seed analytics table with pre-computed metrics."""
     analytics_data = [
@@ -388,27 +384,32 @@ def seed_analytics(db: Session):
             ]
         }
     ]
-
+    
     for metric_data in analytics_data:
         metric = Analytics(**metric_data)
         db.add(metric)
-
+    
     db.commit()
     print(f"✅ Seeded {len(analytics_data)} analytics metrics")
-
-
+    
 def seed_all():
     """Seed all tables with demo data."""
+    # Check if running in production
+    if os.getenv('ENVIRONMENT') == 'production':
+        print("⚠️  Demo seeding disabled in production")
+        print("   Use seed_production.py instead")
+        return
+    
     print("🌱 Starting database seeding for Green Matchers demo...")
     print("=" * 50)
-
+    
     # Create database tables first
     print("🔨 Creating database tables...")
     init_db()
     print("✅ Database tables created")
-
+    
     db = SessionLocal()
-
+    
     try:
         # Clear existing data (optional - comment out if you want to keep existing data)
         print("🗑️  Clearing existing data...")
@@ -451,7 +452,6 @@ def seed_all():
         db.rollback()
     finally:
         db.close()
-
-
+    
 if __name__ == "__main__":
     seed_all()

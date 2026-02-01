@@ -4,6 +4,8 @@ Green Matchers - Main FastAPI Application
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from core.config import get_settings
+from core.logging import setup_logging
+from core.security_headers import SecurityHeadersMiddleware
 from routes import (
     auth_router,
     users_router,
@@ -12,6 +14,9 @@ from routes import (
     applications_router,
     analytics_router,
 )
+
+# Setup logging
+setup_logging()
 
 settings = get_settings()
 
@@ -22,6 +27,9 @@ app = FastAPI(
     docs_url="/docs",
     redoc_url="/redoc"
 )
+
+# Add security headers middleware
+app.add_middleware(SecurityHeadersMiddleware)
 
 # CORS middleware
 app.add_middleware(
@@ -40,7 +48,6 @@ app.include_router(careers_router, prefix="/api/careers", tags=["Careers"])
 app.include_router(applications_router, prefix="/api/applications", tags=["Applications"])
 app.include_router(analytics_router, prefix="/api/analytics", tags=["Analytics"])
 
-
 @app.get("/")
 def root():
     """Root endpoint."""
@@ -53,9 +60,12 @@ def root():
 
 @app.get("/health")
 def health_check():
-    """Health check endpoint."""
-    return {"status": "healthy", "service": "green-matchers-api"}
-
+    """Health check endpoint for monitoring."""
+    return {
+        "status": "healthy",
+        "service": "green-matchers-api",
+        "version": settings.APP_VERSION
+    }
 
 if __name__ == "__main__":
     import uvicorn
