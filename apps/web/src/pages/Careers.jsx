@@ -70,26 +70,26 @@ const Careers = () => {
   };
 
   // Get SDG color based on SDG number
-  const getSDGColor = (sdg) => {
+  const getSDGColor = (sdgId) => {
     const colors = {
-      'SDG 7': 'bg-yellow-500',
-      'SDG 11': 'bg-orange-500',
-      'SDG 12': 'bg-red-500',
-      'SDG 13': 'bg-green-500',
-      'SDG 14': 'bg-blue-500',
-      'SDG 15': 'bg-green-600',
+      7: 'bg-yellow-500',
+      11: 'bg-orange-500',
+      12: 'bg-red-500',
+      13: 'bg-green-500',
+      14: 'bg-blue-500',
+      15: 'bg-green-600',
     };
-    return colors[sdg] || 'bg-gray-500';
+    return colors[sdgId] || 'bg-gray-500';
   };
 
   const sdgOptions = [
     { value: '', label: t('careers.allSDGs') || 'All SDGs' },
-    { value: 'SDG 7', label: 'SDG 7 - Affordable & Clean Energy' },
-    { value: 'SDG 11', label: 'SDG 11 - Sustainable Cities' },
-    { value: 'SDG 12', label: 'SDG 12 - Responsible Consumption' },
-    { value: 'SDG 13', label: 'SDG 13 - Climate Action' },
-    { value: 'SDG 14', label: 'SDG 14 - Life Below Water' },
-    { value: 'SDG 15', label: 'SDG 15 - Life on Land' },
+    { value: 7, label: 'SDG 7 - Affordable & Clean Energy' },
+    { value: 11, label: 'SDG 11 - Sustainable Cities' },
+    { value: 12, label: 'SDG 12 - Responsible Consumption' },
+    { value: 13, label: 'SDG 13 - Climate Action' },
+    { value: 14, label: 'SDG 14 - Life Below Water' },
+    { value: 15, label: 'SDG 15 - Life on Land' },
   ];
 
   // Loading spinner component

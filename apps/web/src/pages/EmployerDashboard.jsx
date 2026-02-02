@@ -171,16 +171,16 @@ const EmployerDashboard = () => {
   };
 
   // Get SDG color based on SDG number
-  const getSDGColor = (sdg) => {
+  const getSDGColor = (sdgId) => {
     const colors = {
-      'SDG 7': 'bg-yellow-500',
-      'SDG 11': 'bg-orange-500',
-      'SDG 12': 'bg-red-500',
-      'SDG 13': 'bg-green-500',
-      'SDG 14': 'bg-blue-500',
-      'SDG 15': 'bg-green-600',
+      7: 'bg-yellow-500',
+      11: 'bg-orange-500',
+      12: 'bg-red-500',
+      13: 'bg-green-500',
+      14: 'bg-blue-500',
+      15: 'bg-green-600',
     };
-    return colors[sdg] || 'bg-gray-500';
+    return colors[sdgId] || 'bg-gray-500';
   };
 
   // Get status color for applications

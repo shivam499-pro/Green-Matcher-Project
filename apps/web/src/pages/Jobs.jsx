@@ -18,7 +18,14 @@ const Jobs = () => {
   });
   const [showFilters, setShowFilters] = useState(false);
 
-  const sdgTags = ['SDG 7', 'SDG 11', 'SDG 12', 'SDG 13', 'SDG 14', 'SDG 15'];
+  const sdgTags = [
+    { id: 7, label: 'SDG 7' },
+    { id: 11, label: 'SDG 11' },
+    { id: 12, label: 'SDG 12' },
+    { id: 13, label: 'SDG 13' },
+    { id: 14, label: 'SDG 14' },
+    { id: 15, label: 'SDG 15' },
+  ];
 
   useEffect(() => {
     fetchJobs();
@@ -91,16 +98,16 @@ const Jobs = () => {
     setSearchQuery('');
   };
 
-  const getSDGColor = (sdg) => {
+  const getSDGColor = (sdgId) => {
     const colors = {
-      'SDG 7': 'bg-yellow-500',
-      'SDG 11': 'bg-orange-500',
-      'SDG 12': 'bg-red-500',
-      'SDG 13': 'bg-green-500',
-      'SDG 14': 'bg-blue-500',
-      'SDG 15': 'bg-green-600',
+      7: 'bg-yellow-500',
+      11: 'bg-orange-500',
+      12: 'bg-red-500',
+      13: 'bg-green-500',
+      14: 'bg-blue-500',
+      15: 'bg-green-600',
     };
-    return colors[sdg] || 'bg-gray-500';
+    return colors[sdgId] || 'bg-gray-500';
   };
 
   return (
@@ -196,7 +203,7 @@ const Jobs = () => {
                   >
                     <option value="">{t('All SDGs')}</option>
                     {sdgTags.map(sdg => (
-                      <option key={sdg} value={sdg}>{sdg}</option>
+                      <option key={sdg.id} value={sdg.id}>{sdg.label}</option>
                     ))}
                   </select>
                 </div>
