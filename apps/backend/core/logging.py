@@ -4,7 +4,7 @@ Green Matchers - Logging Configuration
 import logging
 import sys
 from pathlib import Path
-from core.config import settings
+from core.config import get_settings
 
 def setup_logging():
     """Setup application logging."""
