@@ -1,5 +1,5 @@
 """
-Green Matchers - Global Exception Handler
+Green Matchers - Global Exception Handler (FIXED)
 """
 from fastapi import FastAPI, Request, status
 from fastapi.responses import JSONResponse
@@ -15,13 +15,38 @@ def register_exception_handlers(app: FastAPI):
     
     @app.exception_handler(RequestValidationError)
     async def validation_exception_handler(request: Request, exc: RequestValidationError):
-        """Handle Pydantic validation errors."""
+        """
+        Handle Pydantic validation errors.
+        Fixed to properly serialize errors with bytes input.
+        """
         logger.warning(f"Validation error: {exc.errors()}")
+        
+        # Clean the errors to make them JSON serializable
+        cleaned_errors = []
+        for error in exc.errors():
+            cleaned_error = {}
+            for key, value in error.items():
+                if key == 'input' and isinstance(value, bytes):
+                    # Convert bytes to string for JSON serialization
+                    cleaned_error[key] = value.decode('utf-8', errors='replace')
+                elif key == 'ctx' and isinstance(value, dict):
+                    # Clean context dict if it contains bytes
+                    cleaned_ctx = {}
+                    for ctx_key, ctx_value in value.items():
+                        if isinstance(ctx_value, bytes):
+                            cleaned_ctx[ctx_key] = ctx_value.decode('utf-8', errors='replace')
+                        else:
+                            cleaned_ctx[ctx_key] = ctx_value
+                    cleaned_error[key] = cleaned_ctx
+                else:
+                    cleaned_error[key] = value
+            cleaned_errors.append(cleaned_error)
+        
         return JSONResponse(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             content={
                 "detail": "Validation error",
-                "errors": exc.errors()
+                "errors": cleaned_errors
             }
         )
     
