@@ -34,6 +34,9 @@ class Settings(BaseSettings):
     # Environment
     ENVIRONMENT: str = Field(default="development")
     
+    # Google Translate API (optional)
+    GOOGLE_TRANSLATE_API_KEY: str = Field(default="", validate_default=True)
+    
     class Config:
         env_file = ".env"
         case_sensitive = True

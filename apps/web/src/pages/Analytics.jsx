@@ -8,6 +8,7 @@ import AnalyticsOverview from '../components/analytics/AnalyticsOverview';
 import CareerDemandChart from '../components/analytics/CareerDemandChart';
 import SkillPopularityChart from '../components/analytics/SkillPopularityChart';
 import SalaryRangeChart from '../components/analytics/SalaryRangeChart';
+import { t } from '../utils/translations';
 import SDGDistributionChart from '../components/analytics/SDGDistributionChart';
 import {
   getAnalyticsOverview,

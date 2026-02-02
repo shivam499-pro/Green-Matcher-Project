@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 
 import { usersAPI } from '../utils/api';
+import { t } from '../utils/translations';
 
 const ApplicantView = () => {
   

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { jobsAPI, savedJobsAPI } from '../utils/api';
+import { t } from '../utils/translations';
 
 const Jobs = () => {
   
