@@ -593,17 +593,4 @@ For issues and questions, please open an issue on GitHub.
 
 ---
 
-## 🏅 Hackathon Achievements
-
-✅ **AI-Native Platform** - AI built into every feature
-✅ **Semantic Search** - Vector-based similarity search
-✅ **Explainable AI** - Confidence scores, matched/missing skills
-✅ **Green Economy Focus** - SDG-aligned jobs only
-✅ **Responsive Design** - Works on all devices
-✅ **Complete Demo Flow** - Job seeker, employer, admin flows
-✅ **Production-Ready** - Security, monitoring, deployment guides
-✅ **Well-Documented** - Comprehensive documentation
-
----
-
 **Built with ❤️ for India's green economy**
