@@ -2,7 +2,10 @@
 Green Matchers - Secrets Manager Integration
 """
 import os
+import logging
 from typing import Optional
+
+logger = logging.getLogger(__name__)
 
 def get_secret(secret_name: str, default: Optional[str] = None) -> str:
     """
@@ -18,17 +21,23 @@ def get_secret(secret_name: str, default: Optional[str] = None) -> str:
     # Try environment variable first
     value = os.getenv(secret_name)
     if value:
+        logger.debug(f"Secret '{secret_name}' found in environment")
         return value
+    
+    logger.debug(f"Secret '{secret_name}' not in environment, trying AWS Secrets Manager")
     
     # Try AWS Secrets Manager
     try:
         import boto3  # type: ignore
         client = boto3.client('secretsmanager')
         response = client.get_secret_value(SecretId=f'green-matchers/{secret_name}')
+        logger.info(f"Secret '{secret_name}' retrieved from AWS Secrets Manager")
         return response['SecretString']
-    except Exception:
-        pass
-
+    except Exception as e:
+        logger.warning(f"Failed to get '{secret_name}' from AWS Secrets Manager: {e}")
+    
+    logger.debug(f"Secret '{secret_name}' not in AWS, trying Azure Key Vault")
+    
     # Try Azure Key Vault
     try:
         from azure.identity import DefaultAzureCredential  # type: ignore
@@ -42,12 +51,15 @@ def get_secret(secret_name: str, default: Optional[str] = None) -> str:
             credential=credential
         )
         secret = client.get_secret(secret_name)
+        logger.info(f"Secret '{secret_name}' retrieved from Azure Key Vault")
         return secret.value
-    except Exception:
-        pass
+    except Exception as e:
+        logger.warning(f"Failed to get '{secret_name}' from Azure Key Vault: {e}")
     
     # Return default if available
     if default:
+        logger.debug(f"Returning default value for secret '{secret_name}'")
         return default
     
+    logger.error(f"Secret '{secret_name}' not found in any source")
     raise ValueError(f"Secret '{secret_name}' not found")

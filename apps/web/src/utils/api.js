@@ -1,5 +1,5 @@
 /**
- * Green Matchers - API Utility
+ * Green Matchers - API Utility (CORRECTED FOR YOUR BACKEND)
  * Handles all API communication with the backend
  */
 import axios from 'axios';
@@ -35,11 +35,39 @@ api.interceptors.request.use(
   }
 );
 
-// API functions
+// Handle 401 errors (redirect to login)
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      const currentPath = window.location.pathname;
+      if (currentPath !== '/login' && currentPath !== '/register') {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        window.location.href = '/login';
+      }
+    }
+    return Promise.reject(error);
+  }
+);
+
+// ✅ FIXED: Auth API - Sends JSON as your backend expects
 export const authAPI = {
-  login: (credentials) => api.post('/api/auth/login', credentials),
+  login: (credentials) => {
+    // Your backend expects JSON with 'email' and 'password'
+    return api.post('/api/auth/login', {
+      email: credentials.email,
+      password: credentials.password,
+    });
+  },
+  
   register: (userData) => api.post('/api/auth/register', userData),
-  logout: () => api.post('/api/auth/logout'),
+  
+  logout: () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    return api.post('/api/auth/logout');
+  },
 };
 
 export const usersAPI = {

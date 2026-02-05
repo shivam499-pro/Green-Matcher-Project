@@ -3,7 +3,7 @@ Green Matchers - Career Model
 """
 from sqlalchemy import Column, Integer, String, Text, Float, DateTime, JSON
 from sqlalchemy.orm import relationship
-from datetime import datetime
+from datetime import datetime, timezone
 from utils.db import Base
 
 
@@ -25,17 +25,26 @@ class Career(Base):
     # Salary information
     avg_salary_min = Column(Integer, nullable=True)
     avg_salary_max = Column(Integer, nullable=True)
+    avg_salary = Column(Integer, nullable=True)
+    
+    # Growth potential
+    growth_potential = Column(String(50), default="Medium")  # Low, Medium, High, Very High
     
     # Demand score (calculated from job applications)
     demand_score = Column(Float, default=0.0)
     
     # Vector embedding for semantic search (768-dim from all-mpnet-base-v2)
     # Note: MariaDB 10.11+ supports VECTOR type
+    # TODO: migrate to VECTOR / JSONB when DB supports native embeddings
     embedding = Column(String(5000), nullable=True)  # Store as JSON string for compatibility
     
     # Timestamps
-    created_at = Column(DateTime, default=datetime.utcnow)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+    updated_at = Column(
+        DateTime,
+        default=lambda: datetime.now(timezone.utc),
+        onupdate=lambda: datetime.now(timezone.utc)
+    )
 
     # Relationships
     jobs = relationship("Job", back_populates="career", cascade="all, delete-orphan")

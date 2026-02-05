@@ -1,11 +1,9 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-
 import { userAPI } from '../utils/api';
-import { t } from '../utils/translations';
+import { t } from '../utils/i18n';
 
 const Profile = () => {
-  
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -93,9 +91,9 @@ const Profile = () => {
         language: profile.language,
       });
 
-      // Update skills separately
+      // Update skills separately - send array directly, not object
       if (profile.skills.length > 0) {
-        await userAPI.updateSkills({ skills: profile.skills });
+        await userAPI.updateSkills(profile.skills);
       }
 
       setMessage({ type: 'success', text: t('Profile updated successfully!') });
@@ -336,11 +334,9 @@ const Profile = () => {
                 <svg className="w-12 h-12 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
                 </svg>
-                <p className="text-sm text-gray-600 mb-4">
-                  {t('Upload your resume (PDF, DOC, DOCX)')}
-                </p>
+                <p className="text-sm text-gray-600 mb-4">{t('Upload your resume')}</p>
                 <label className="cursor-pointer px-6 py-3 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors">
-                  {t('Upload Resume')}
+                  {t('Choose File')}
                   <input type="file" accept=".pdf,.doc,.docx" onChange={handleResumeUpload} className="hidden" />
                 </label>
               </div>
@@ -361,7 +357,7 @@ const Profile = () => {
               disabled={saving}
               className="px-6 py-3 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {saving ? (t('Saving...')) : (t('Save Profile'))}
+              {saving ? t('Saving...') : t('Save Profile')}
             </button>
           </div>
         </form>

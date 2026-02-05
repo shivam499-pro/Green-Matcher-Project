@@ -19,8 +19,9 @@ def register(user_data: UserRegister, db: DatabaseSession):
     - **email**: User email address
     - **password**: User password (min 8 characters)
     - **full_name**: User's full name
-    - **role**: User role (USER, EMPLOYER, ADMIN)
     - **language**: Preferred language (default: en)
+    
+    Note: Role is always set to USER server-side for security.
     """
     # Check if user already exists
     existing_user = db.query(User).filter(User.email == user_data.email).first()
@@ -30,12 +31,12 @@ def register(user_data: UserRegister, db: DatabaseSession):
             detail="Email already registered"
         )
     
-    # Create new user
+    # Create new user with role set server-side (USER only)
     new_user = User(
         email=user_data.email,
         password_hash=get_password_hash(user_data.password),
         full_name=user_data.full_name,
-        role=user_data.role,
+        role=UserRole.USER,  # Always USER - no client control
         language=user_data.language
     )
     
@@ -63,7 +64,7 @@ def login(credentials: UserLogin, db: DatabaseSession):
             detail="Invalid email or password"
         )
     
-    # Create access token
+    # Create access token with consistent field names
     access_token = create_access_token(
         data={"sub": str(user.id), "role": user.role.value}
     )

@@ -13,6 +13,7 @@ from schemas.application import ApplicationCreate, ApplicationUpdate, Applicatio
 router = APIRouter()
 
 
+
 @router.get("", response_model=List[ApplicationResponse])
 def list_applications(
     db: DatabaseSession,
@@ -20,23 +21,21 @@ def list_applications(
     status_filter: Optional[str] = None,
     skip: int = 0,
     limit: int = 20,
-    current_user: dict = Depends(get_current_user)
+    current_user: User = Depends(get_current_user)
 ):
     """
     List applications for current user or employer's jobs.
     """
-    user = db.query(User).filter(User.id == int(current_user["user_id"])).first()
-    
     query = db.query(Application)
     
     # Filter based on user role
-    if user.role.value == "EMPLOYER":
+    if current_user.role.value == "EMPLOYER":
         # Employers see applications for their jobs
-        job_ids = [job.id for job in user.posted_jobs]
+        job_ids = [job.id for job in current_user.posted_jobs]
         query = query.filter(Application.job_id.in_(job_ids))
     else:
         # Job seekers see their own applications
-        query = query.filter(Application.user_id == user.id)
+        query = query.filter(Application.user_id == current_user.id)
     
     # Apply additional filters
     if job_id:
@@ -57,7 +56,7 @@ def list_applications(
 def get_application(
     db: DatabaseSession,
     application_id: int,
-    current_user: dict = Depends(get_current_user)
+    current_user: User = Depends(get_current_user)
 ):
     """
     Get application details by ID.
@@ -70,16 +69,15 @@ def get_application(
         )
     
     # Verify user has access to this application
-    user = db.query(User).filter(User.id == int(current_user["user_id"])).first()
-    if user.role.value == "EMPLOYER":
+    if current_user.role.value == "EMPLOYER":
         # Employers can only see applications for their jobs
         job = db.query(Job).filter(Job.id == application.job_id).first()
-        if job.employer_id != user.id:
+        if job.employer_id != current_user.id:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail="Access denied"
             )
-    elif application.user_id != user.id:
+    elif application.user_id != current_user.id:
         # Job seekers can only see their own applications
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
@@ -117,14 +115,13 @@ def get_application(
 def create_application(
     application_data: ApplicationCreate,
     db: DatabaseSession,
-    current_user: dict = Depends(get_current_user)
+    current_user: User = Depends(get_current_user)
 ):
     """
     Apply to a job (job seeker only).
     """
     # Verify user is a job seeker
-    user = db.query(User).filter(User.id == int(current_user["user_id"])).first()
-    if user.role.value != "USER":
+    if current_user.role.value != "USER":
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Only job seekers can apply to jobs"
@@ -141,7 +138,7 @@ def create_application(
     # Check if user already applied to this job
     existing_application = db.query(Application).filter(
         Application.job_id == application_data.job_id,
-        Application.user_id == user.id
+        Application.user_id == current_user.id
     ).first()
     
     if existing_application:
@@ -153,7 +150,7 @@ def create_application(
     # Create new application
     new_application = Application(
         job_id=application_data.job_id,
-        user_id=user.id,
+        user_id=current_user.id,
         cover_letter=application_data.cover_letter,
         status="PENDING"
     )
@@ -170,7 +167,7 @@ def update_application(
     application_id: int,
     application_update: ApplicationUpdate,
     db: DatabaseSession,
-    current_user: dict = Depends(get_current_user)
+    current_user: User = Depends(get_current_user)
 ):
     """
     Update application status (employer only).
@@ -184,9 +181,8 @@ def update_application(
     
     # Verify user is the employer who posted the job
     job = db.query(Job).filter(Job.id == application.job_id).first()
-    user = db.query(User).filter(User.id == int(current_user["user_id"])).first()
     
-    if job.employer_id != user.id:
+    if job.employer_id != current_user.id:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="You can only update applications for your own jobs"
@@ -204,7 +200,7 @@ def update_application(
 def delete_application(
     application_id: int,
     db: DatabaseSession,
-    current_user: dict = Depends(get_current_user)
+    current_user: User = Depends(get_current_user)
 ):
     """
     Delete an application (job seeker only, can only delete own applications).
@@ -217,7 +213,7 @@ def delete_application(
         )
     
     # Verify user owns this application
-    if application.user_id != int(current_user["user_id"]):
+    if application.user_id != current_user.id:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="You can only delete your own applications"

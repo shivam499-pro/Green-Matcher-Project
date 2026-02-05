@@ -79,14 +79,13 @@ def get_career(career_id: int, db: DatabaseSession):
 def create_career(
     career_data: CareerCreate,
     db: DatabaseSession,
-    current_user: dict = Depends(get_current_user)
+    current_user: User = Depends(get_current_user)
 ):
     """
     Create a new career (admin only).
     """
     # Verify user is an admin
-    user = db.query(User).filter(User.id == int(current_user["user_id"])).first()
-    if user.role.value != "ADMIN":
+    if current_user.role.value != "ADMIN":
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Only admins can create careers"
@@ -115,7 +114,7 @@ def update_career(
     career_id: int,
     career_update: CareerUpdate,
     db: DatabaseSession,
-    current_user: dict = Depends(get_current_user)
+    current_user: User = Depends(get_current_user)
 ):
     """
     Update a career (admin only).
@@ -128,8 +127,7 @@ def update_career(
         )
     
     # Verify user is an admin
-    user = db.query(User).filter(User.id == int(current_user["user_id"])).first()
-    if user.role.value != "ADMIN":
+    if current_user.role.value != "ADMIN":
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Only admins can update careers"
@@ -161,7 +159,7 @@ def update_career(
 def delete_career(
     career_id: int,
     db: DatabaseSession,
-    current_user: dict = Depends(get_current_user)
+    current_user: User = Depends(get_current_user)
 ):
     """
     Delete a career (admin only).
@@ -174,8 +172,7 @@ def delete_career(
         )
     
     # Verify user is an admin
-    user = db.query(User).filter(User.id == int(current_user["user_id"])).first()
-    if user.role.value != "ADMIN":
+    if current_user.role.value != "ADMIN":
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Only admins can delete careers"

@@ -6,6 +6,8 @@ from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
 from sqlalchemy.exc import SQLAlchemyError
 import logging
+from fastapi.exceptions import HTTPException
+
 
 logger = logging.getLogger(__name__)
 
@@ -48,6 +50,12 @@ def register_exception_handlers(app: FastAPI):
                 "detail": "Validation error",
                 "errors": cleaned_errors
             }
+        )
+    @app.exception_handler(HTTPException)
+    async def http_exception_handler(request: Request, exc: HTTPException):
+        return JSONResponse(
+            status_code=exc.status_code,
+            content={"detail": exc.detail}
         )
     
     @app.exception_handler(SQLAlchemyError)

@@ -3,7 +3,7 @@ Green Matchers - User Model
 """
 from sqlalchemy import Column, Integer, String, DateTime, Enum as SQLEnum, JSON
 from sqlalchemy.orm import relationship
-from datetime import datetime
+from datetime import datetime, timezone
 from utils.db import Base
 import enum
 
@@ -31,7 +31,6 @@ class User(Base):
     skills = Column(JSON, nullable=True)  # Array of skill strings
     resume_url = Column(String(500), nullable=True)
     language = Column(String(10), default="en")  # Preferred language
-    saved_jobs = Column(JSON, nullable=True)  # Array of saved job IDs
     
     # Employer specific fields
     company_name = Column(String(255), nullable=True)
@@ -39,13 +38,26 @@ class User(Base):
     company_website = Column(String(500), nullable=True)
     is_verified = Column(Integer, default=0)  # 0 = not verified, 1 = verified
     
+    # User preferences
+    email_notifications = Column(Integer, default=1)
+    job_alerts = Column(Integer, default=1)
+    application_updates = Column(Integer, default=1)
+    profile_visibility = Column(String(50), default="public")
+    timezone = Column(String(50), default="UTC")
+    theme = Column(String(20), default="light")
+    preferences = Column(JSON, nullable=True)
+    
     # Timestamps
-    created_at = Column(DateTime, default=datetime.utcnow)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+    updated_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
 
     # Relationships
     posted_jobs = relationship("Job", back_populates="employer", cascade="all, delete-orphan")
     applications = relationship("Application", back_populates="applicant", cascade="all, delete-orphan")
+    saved_jobs = relationship("SavedJob", back_populates="user", cascade="all, delete-orphan")
+    job_alerts = relationship("JobAlert", back_populates="user", cascade="all, delete-orphan")
+    notifications = relationship("Notification", back_populates="user", cascade="all, delete-orphan")
+    browse_history = relationship("BrowseHistory", back_populates="user", cascade="all, delete-orphan")
 
     def __repr__(self):
         return f"<User(id={self.id}, email={self.email}, role={self.role})>"

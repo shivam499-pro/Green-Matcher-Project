@@ -3,7 +3,7 @@ Green Matchers - Job Model
 """
 from sqlalchemy import Column, Integer, String, Text, DateTime, ForeignKey, JSON, Boolean
 from sqlalchemy.orm import relationship
-from datetime import datetime
+from datetime import datetime, timezone
 from utils.db import Base
 
 
@@ -22,30 +22,51 @@ class Job(Base):
     description = Column(Text, nullable=False)
     requirements = Column(Text, nullable=True)
     
+    # Job type
+    job_type = Column(String(50), nullable=True)  # full-time, part-time, contract, internship
+    
+    # Skills
+    required_skills = Column(JSON, nullable=True)  # Array of required skills
+    preferred_skills = Column(JSON, nullable=True)  # Array of preferred skills
+    
+    # Experience level
+    experience_level = Column(String(50), nullable=True)  # entry, mid, senior, lead, executive
+    
     # Salary information
     salary_min = Column(Integer, nullable=True)
     salary_max = Column(Integer, nullable=True)
     
     # Location
     location = Column(String(255), nullable=True)
+    is_remote = Column(Boolean, default=False)
     
     # SDG (Sustainable Development Goals) tags
     sdg_tags = Column(JSON, nullable=True)  # Array of SDG goal numbers
+    
+    # Active status
+    is_active = Column(Boolean, default=True)
     
     # Verification status
     is_verified = Column(Boolean, default=False)
     
     # Vector embedding for semantic search (768-dim from all-mpnet-base-v2)
+    # TODO: migrate to VECTOR / JSONB when DB supports native embeddings
     embedding = Column(String(5000), nullable=True)  # Store as JSON string for compatibility
     
     # Timestamps
-    created_at = Column(DateTime, default=datetime.utcnow)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+    updated_at = Column(
+        DateTime,
+        default=lambda: datetime.now(timezone.utc),
+        onupdate=lambda: datetime.now(timezone.utc)
+    )
 
     # Relationships
     employer = relationship("User", back_populates="posted_jobs")
     career = relationship("Career", back_populates="jobs")
     applications = relationship("Application", back_populates="job", cascade="all, delete-orphan")
+    saved_by = relationship("SavedJob", back_populates="job", cascade="all, delete-orphan")
+    viewers = relationship("BrowseHistory", back_populates="job", cascade="all, delete-orphan")
 
     def __repr__(self):
         return f"<Job(id={self.id}, title={self.title}, employer_id={self.employer_id})>"

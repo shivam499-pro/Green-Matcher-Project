@@ -101,14 +101,13 @@ def get_job(job_id: int, db: DatabaseSession):
 def create_job(
     job_data: JobCreate,
     db: DatabaseSession,
-    current_user: dict = Depends(get_current_user)
+    current_user: User = Depends(get_current_user)
 ):
     """
     Create a new job posting (employer only).
     """
     # Verify user is an employer
-    user = db.query(User).filter(User.id == int(current_user["user_id"])).first()
-    if user.role.value != "EMPLOYER":
+    if current_user.role.value != "EMPLOYER":
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Only employers can create job postings"
@@ -116,7 +115,7 @@ def create_job(
     
     # Create new job
     new_job = Job(
-        employer_id=user.id,
+        employer_id=current_user.id,
         career_id=job_data.career_id,
         title=job_data.title,
         description=job_data.description,
@@ -140,7 +139,7 @@ def update_job(
     job_id: int,
     job_update: JobUpdate,
     db: DatabaseSession,
-    current_user: dict = Depends(get_current_user)
+    current_user: User = Depends(get_current_user)
 ):
     """
     Update a job posting (employer only).
@@ -153,7 +152,7 @@ def update_job(
         )
     
     # Verify user owns this job
-    if job.employer_id != int(current_user["user_id"]):
+    if job.employer_id != current_user.id:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="You can only update your own job postings"
@@ -175,7 +174,7 @@ def update_job(
     if job_update.sdg_tags is not None:
         job.sdg_tags = job_update.sdg_tags
     # Only admins can update verification status
-    if job_update.is_verified is not None and current_user["role"] == "ADMIN":
+    if job_update.is_verified is not None and current_user.role.value == "ADMIN":
         job.is_verified = job_update.is_verified
     
     db.commit()
@@ -188,7 +187,7 @@ def update_job(
 def delete_job(
     job_id: int,
     db: DatabaseSession,
-    current_user: dict = Depends(get_current_user)
+    current_user: User = Depends(get_current_user)
 ):
     """
     Delete a job posting (employer only).
@@ -201,7 +200,7 @@ def delete_job(
         )
     
     # Verify user owns this job
-    if job.employer_id != int(current_user["user_id"]):
+    if job.employer_id != current_user.id:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="You can only delete your own job postings"

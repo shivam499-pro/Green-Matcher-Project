@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Navigation from './components/common/Navigation';
+import ProtectedRoute from './components/common/ProtectedRoute';
 import Landing from './pages/Landing';
 import Login from './pages/Login';
 import Register from './pages/Register';
@@ -13,28 +14,97 @@ import EmployerProfile from './pages/EmployerProfile';
 import AdminDashboard from './pages/AdminDashboard';
 import Careers from './pages/Careers';
 import Analytics from './pages/Analytics';
+import ApplicantView from './pages/ApplicantView';
 
+/**
+ * Green Matchers - Main App Component
+ * Handles routing with protected routes based on user roles
+ */
 function App() {
   return (
     <BrowserRouter>
-      <div className="min-h-screen">
+      <div className="min-h-screen bg-gray-50">
         {/* Navigation */}
         <Navigation />
  
         <Routes>
+          {/* Public Routes */}
           <Route path="/" element={<Landing />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
-          <Route path="/profile" element={<Profile />} />
-          <Route path="/recommendations" element={<Recommendations />} />
-          <Route path="/dashboard" element={<JobSeekerDashboard />} />
-          <Route path="/employer-dashboard" element={<EmployerDashboard />} />
-          <Route path="/employer-profile" element={<EmployerProfile />} />
-          <Route path="/admin-dashboard" element={<AdminDashboard />} />
-          <Route path="/analytics" element={<Analytics />} />
           <Route path="/jobs" element={<Jobs />} />
           <Route path="/jobs/:id" element={<JobDetail />} />
           <Route path="/careers" element={<Careers />} />
+          
+          {/* Job Seeker Protected Routes */}
+          <Route 
+            path="/dashboard" 
+            element={
+              <ProtectedRoute requiredRole="USER">
+                <JobSeekerDashboard />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/profile" 
+            element={
+              <ProtectedRoute requiredRole="USER">
+                <Profile />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/recommendations" 
+            element={
+              <ProtectedRoute requiredRole="USER">
+                <Recommendations />
+              </ProtectedRoute>
+            } 
+          />
+          
+          {/* Employer Protected Routes */}
+          <Route 
+            path="/employer-dashboard" 
+            element={
+              <ProtectedRoute requiredRole="EMPLOYER">
+                <EmployerDashboard />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/employer-profile" 
+            element={
+              <ProtectedRoute requiredRole="EMPLOYER">
+                <EmployerProfile />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/applicants/:jobId" 
+            element={
+              <ProtectedRoute requiredRole="EMPLOYER">
+                <ApplicantView />
+              </ProtectedRoute>
+            } 
+          />
+          
+          {/* Admin Protected Routes */}
+          <Route 
+            path="/admin-dashboard" 
+            element={
+              <ProtectedRoute requiredRole="ADMIN">
+                <AdminDashboard />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/analytics" 
+            element={
+              <ProtectedRoute requiredRole="ADMIN">
+                <Analytics />
+              </ProtectedRoute>
+            } 
+          />
         </Routes>
       </div>
     </BrowserRouter>

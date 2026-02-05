@@ -7,7 +7,7 @@ from core.config import get_settings
 from core.logging import setup_logging
 from core.security_headers import SecurityHeadersMiddleware
 from core.exceptions import register_exception_handlers
-from core.rate_limit import limiter
+from core.rate_limit import limiter, rate_limit_exceeded_handler
 from routes import (
     auth_router,
     users_router,
@@ -32,6 +32,9 @@ app = FastAPI(
 
 # Register global exception handlers
 register_exception_handlers(app)
+
+# Register rate limit exceeded handler
+app.add_exception_handler(limiter._rate_limit_exceeded_handler.__func__, rate_limit_exceeded_handler)
 
 # Add rate limiting
 app.state.limiter = limiter

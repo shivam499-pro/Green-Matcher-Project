@@ -13,13 +13,17 @@ class UserBase(BaseModel):
     """Base user schema with common fields."""
     email: EmailStr
     full_name: Optional[str] = None
-    role: UserRole = UserRole.USER
 
 
 # User Registration Schema
-class UserRegister(UserBase):
-    """Schema for user registration."""
+class UserRegister(BaseModel):
+    """
+    Schema for user registration.
+    Note: role is set server-side only (default: USER)
+    """
+    email: EmailStr
     password: str = Field(..., min_length=8, description="Password must be at least 8 characters")
+    full_name: Optional[str] = None
     language: str = "en"
 
 
@@ -47,9 +51,9 @@ class EmployerProfileUpdate(BaseModel):
     company_website: Optional[str] = None
 
 
-# User Response Schema
+# User Response Schema (Full - for authenticated requests)
 class UserResponse(BaseModel):
-    """Schema for user response."""
+    """Schema for user response (includes all fields)."""
     id: int
     email: str
     full_name: Optional[str] = None
@@ -62,6 +66,21 @@ class UserResponse(BaseModel):
     company_website: Optional[str] = None
     is_verified: bool
     created_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
+# User Public Profile Schema (limited data for public endpoints)
+class UserPublicProfile(BaseModel):
+    """Schema for public user profile (limited data, no sensitive info)."""
+    id: int
+    full_name: Optional[str] = None
+    skills: Optional[List[str]] = None
+    resume_url: Optional[str] = None
+    company_name: Optional[str] = None
+    company_description: Optional[str] = None
+    company_website: Optional[str] = None
 
     class Config:
         from_attributes = True
