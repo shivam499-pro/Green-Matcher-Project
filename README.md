@@ -1,3 +1,7 @@
+
+
+
+
 # 📘 Green Matchers
 
 **India's First AI-Native Green-Jobs Platform**
@@ -575,7 +579,138 @@ Missing Skills: ✗ statistics, ✗ deep learning
 
 ---
 
-## 📄 License
+## 🔗 Frontend-Backend Integration Status
+
+### Integration Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                        FRONTEND (React)                          │
+├─────────────────────────────────────────────────────────────────┤
+│  main.jsx                                                        │
+│  └── I18nProvider (translations)                                │
+│      └── AuthProvider (authentication)                          │
+│          └── App.jsx                                            │
+│              └── BrowserRouter (routing)                        │
+│                  ├── Navigation                                 │
+│                  └── Routes (Public + Protected)                │
+└─────────────────────────────────────────────────────────────────┘
+                              │
+                              │ HTTP/REST API
+                              ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                       BACKEND (FastAPI)                          │
+├─────────────────────────────────────────────────────────────────┤
+│  /api/auth/*        - Authentication                            │
+│  /api/users/*       - User management                           │
+│  /api/jobs/*        - Job postings                              │
+│  /api/careers/*     - Career paths                              │
+│  /api/applications/* - Job applications                         │
+│  /api/analytics/*   - Analytics data                            │
+│  /api/ai/*          - AI features                               │
+│  /api/search/*      - Search functionality                      │
+│  /api/preferences/* - User preferences                          │
+│  /api/admin/*       - Admin operations                          │
+└─────────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                      DATABASE (PostgreSQL)                       │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### Storage Keys (localStorage)
+
+| Key | Description |
+|-----|-------------|
+| `green-matchers-token` | JWT authentication token |
+| `green-matchers-user` | User profile data (JSON) |
+| `green-matchers-language` | Language preference (en/hi/ta) |
+| `green-matchers-theme` | Theme preference |
+| `green-matchers-saved-jobs` | Locally saved jobs |
+
+### Frontend Routes
+
+#### Public Routes
+| Path | Component | Description |
+|------|-----------|-------------|
+| `/` | Landing | Home page |
+| `/login` | Login | User login |
+| `/register` | Register | User registration |
+| `/jobs` | Jobs | Job listings |
+| `/jobs/:id` | JobDetail | Job details |
+| `/careers` | Careers | Career paths |
+
+#### Protected Routes - Job Seeker (USER Role)
+| Path | Component | Description |
+|------|-----------|-------------|
+| `/dashboard` | JobSeekerDashboard | Job seeker dashboard |
+| `/profile` | Profile | User profile |
+| `/recommendations` | Recommendations | AI recommendations |
+| `/saved-jobs` | SavedJobs | Saved jobs list |
+| `/settings` | Settings | User settings |
+
+#### Protected Routes - Employer (EMPLOYER Role)
+| Path | Component | Description |
+|------|-----------|-------------|
+| `/employer-dashboard` | EmployerDashboard | Employer dashboard |
+| `/employer-profile` | EmployerProfile | Company profile |
+| `/applicants/:jobId` | ApplicantView | View applicants |
+
+#### Protected Routes - Admin (ADMIN Role)
+| Path | Component | Description |
+|------|-----------|-------------|
+| `/admin-dashboard` | AdminDashboard | Admin dashboard |
+| `/analytics` | Analytics | Analytics dashboard |
+
+### Internationalization (i18n)
+
+Supported languages:
+- **English (en)** - Default
+- **Hindi (hi)** - हिंदी
+- **Tamil (ta)** - தமிழ்
+
+Translation files: `apps/web/src/translations/`
+
+### User Roles
+
+| Role | Description | Access |
+|------|-------------|--------|
+| `USER` | Job Seeker | Browse jobs, apply, get AI recommendations |
+| `EMPLOYER` | Employer | Post jobs, manage applications |
+| `ADMIN` | Administrator | Full system access, analytics |
+
+### Key Integration Points
+
+1. **AuthContext ↔ I18nContext**: Language preference syncs with user profile
+2. **ProtectedRoute ↔ AuthContext**: Role-based route protection
+3. **All Pages ↔ Backend**: Connected via services and utils/api.js
+4. **API Interceptors**: Auto-attach auth token, handle 401 errors
+
+### Commands to Verify Integration
+
+```powershell
+# Start Backend
+cd C:\Green-Matcher-Project\apps\backend
+python -m uvicorn main:app --reload --host 0.0.0.0 --port 8000
+
+# Start Frontend (new terminal)
+cd C:\Green-Matcher-Project\apps\web
+npm run dev
+
+# Check Backend Health
+Invoke-WebRequest -Uri "http://localhost:8000/health" -UseBasicParsing
+
+# Open API Documentation
+Start-Process "http://localhost:8000/docs"
+
+# Access Frontend
+Start-Process "http://localhost:5173"
+```
+
+---
+
+##  License
 
 MIT License - See LICENSE file for details
 
