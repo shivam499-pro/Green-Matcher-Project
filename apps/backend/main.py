@@ -3,18 +3,23 @@ Green Matchers - Main FastAPI Application
 """
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from core.config import get_settings
-from core.logging import setup_logging
-from core.security_headers import SecurityHeadersMiddleware
-from core.exceptions import register_exception_handlers
-from core.rate_limit import limiter, rate_limit_exceeded_handler
-from routes import (
+
+from apps.backend.core.config import get_settings
+from apps.backend.core.logging import setup_logging
+from apps.backend.core.exceptions import register_exception_handlers
+from apps.backend.core.security_headers import SecurityHeadersMiddleware
+
+from apps.backend.routes import (
     auth_router,
     users_router,
     jobs_router,
     careers_router,
     applications_router,
     analytics_router,
+    admin_router,
+    ai_router,
+    search_router,
+    preferences_router,
 )
 
 # Setup logging
@@ -30,14 +35,8 @@ app = FastAPI(
     redoc_url="/redoc"
 )
 
-# Register global exception handlers
+# Register exception handlers
 register_exception_handlers(app)
-
-# Register rate limit exceeded handler
-app.add_exception_handler(limiter._rate_limit_exceeded_handler.__func__, rate_limit_exceeded_handler)
-
-# Add rate limiting
-app.state.limiter = limiter
 
 # Add security headers middleware
 app.add_middleware(SecurityHeadersMiddleware)
@@ -58,6 +57,11 @@ app.include_router(jobs_router, prefix="/api/jobs", tags=["Jobs"])
 app.include_router(careers_router, prefix="/api/careers", tags=["Careers"])
 app.include_router(applications_router, prefix="/api/applications", tags=["Applications"])
 app.include_router(analytics_router, prefix="/api/analytics", tags=["Analytics"])
+app.include_router(admin_router, prefix="/api/admin", tags=["Admin"])
+app.include_router(ai_router, prefix="/api/ai", tags=["AI"])
+app.include_router(search_router, prefix="/api/search", tags=["Search"])
+app.include_router(preferences_router, prefix="/api/preferences", tags=["Preferences"])
+
 
 @app.get("/")
 def root():
@@ -77,6 +81,7 @@ def health_check():
         "service": "green-matchers-api",
         "version": settings.APP_VERSION
     }
+
 
 if __name__ == "__main__":
     import uvicorn

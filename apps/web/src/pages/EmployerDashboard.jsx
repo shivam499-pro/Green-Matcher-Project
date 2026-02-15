@@ -1,12 +1,14 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import { jobsAPI, applicationsAPI } from '../utils/api';
-import { t } from '../utils/translations';
+import { jobsAPI } from '../utils/api';
+import { applicationsService } from '../services';
+import { useI18n } from '../contexts/I18nContext';
 
 const EmployerDashboard = () => {
   
   const navigate = useNavigate();
+  const { t } = useI18n();
   
   // State management
   const [loading, setLoading] = useState(true);
@@ -25,32 +27,50 @@ const EmployerDashboard = () => {
     location: '',
     sdg_tags: [],
   });
-
-  // Fetch data when tab changes
-  useEffect(() => {
-    fetchData();
-  }, [activeTab]);
+  const [stats, setStats] = useState({
+    totalJobs: 0,
+    activeJobs: 0,
+    totalApplications: 0,
+    pendingApplications: 0,
+  });
 
   // Fetch data based on active tab
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     setLoading(true);
     setError(null);
 
     try {
       if (activeTab === 'jobs') {
         const response = await jobsAPI.listJobs({ employer_only: true });
-        setJobs(response?.data?.items || response?.data || []);
+        const jobsData = response?.data?.items || response?.data || [];
+        setJobs(jobsData);
+        setStats(prev => ({
+          ...prev,
+          totalJobs: jobsData.length,
+          activeJobs: jobsData.filter(j => j.is_active).length,
+        }));
       } else if (activeTab === 'applications') {
-        const response = await applicationsAPI.listApplications({ employer_view: true });
-        setApplications(response?.data?.items || response?.data || []);
+        const response = await applicationsService.getEmployerApplications();
+        const appsData = response?.items || response || [];
+        setApplications(appsData);
+        setStats(prev => ({
+          ...prev,
+          totalApplications: appsData.length,
+          pendingApplications: appsData.filter(a => a.status === 'PENDING').length,
+        }));
       }
     } catch (err) {
       console.error('Error fetching dashboard data:', err);
-      setError(t('dashboard.fetchError') || 'Failed to load data. Please try again.');
+      setError(t('employer_dashboard.fetch_error', 'Failed to load data. Please try again.'));
     } finally {
       setLoading(false);
     }
-  };
+  }, [activeTab, t]);
+
+  // Fetch data when tab changes
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
 
   // Handle form input changes
   const handleJobFormChange = (e) => {
@@ -71,11 +91,11 @@ const EmployerDashboard = () => {
   // Validate job form
   const validateJobForm = () => {
     if (!jobForm.title.trim()) {
-      setError(t('dashboard.titleRequired') || 'Job title is required');
+      setError(t('employer_dashboard.title_required', 'Job title is required'));
       return false;
     }
     if (!jobForm.description.trim()) {
-      setError(t('dashboard.descriptionRequired') || 'Job description is required');
+      setError(t('employer_dashboard.description_required', 'Job description is required'));
       return false;
     }
     if (!jobForm.location.trim()) {
@@ -159,14 +179,25 @@ const EmployerDashboard = () => {
     }
   };
 
-  // Update application status
-  const handleUpdateApplicationStatus = async (applicationId, status) => {
+  // Accept an application
+  const handleAcceptApplication = async (applicationId) => {
     try {
-      await applicationsAPI.updateApplication(applicationId, { status });
+      await applicationsService.acceptApplication(applicationId);
       await fetchData();
     } catch (err) {
-      console.error('Error updating application:', err);
-      setError(t('dashboard.updateApplicationError') || 'Failed to update application. Please try again.');
+      console.error('Error accepting application:', err);
+      setError(t('dashboard.acceptError') || 'Failed to accept application. Please try again.');
+    }
+  };
+
+  // Reject an application
+  const handleRejectApplication = async (applicationId) => {
+    try {
+      await applicationsService.rejectApplication(applicationId);
+      await fetchData();
+    } catch (err) {
+      console.error('Error rejecting application:', err);
+      setError(t('dashboard.rejectError') || 'Failed to reject application. Please try again.');
     }
   };
 
@@ -396,12 +427,12 @@ const EmployerDashboard = () => {
                                 <svg className="w-4 h-4 mr-1 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                 </svg>
-                                ₹{job.salary_min.toLocaleString()} - ₹{job.salary_max.toLocaleString()}/year
+                                ₹{Number(job.salary_min).toLocaleString()} - ₹{Number(job.salary_max).toLocaleString()}/year
                               </span>
                             )}
                           </div>
                         </div>
-                        {job.is_verified && (
+                        {job.is_verified === true && (
                           <span className="inline-flex items-center px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded flex-shrink-0">
                             <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
                               <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
@@ -474,13 +505,13 @@ const EmployerDashboard = () => {
                       <div className="flex items-start gap-3 mb-3">
                         <div className="flex-1 min-w-0">
                           <h3 className="text-lg font-semibold text-gray-900">
-                            {app.applicant?.full_name || 'Applicant'}
+                            {app.candidate_name || app.applicant?.full_name || 'Applicant'}
                           </h3>
                           <p className="text-sm text-gray-600 mb-1">
                             {app.job?.title || 'Job Position'}
                           </p>
                           <p className="text-sm text-gray-600">
-                            {app.applicant?.email || 'No email provided'}
+                            Applied: {app.created_at ? new Date(app.created_at).toLocaleDateString() : '-'}
                           </p>
                         </div>
                         <span className={`px-3 py-1 text-xs font-medium rounded-full flex-shrink-0 ${getStatusColor(app.status)}`}>
@@ -488,9 +519,9 @@ const EmployerDashboard = () => {
                         </span>
                       </div>
 
-                      {app.applicant?.skills && app.applicant.skills.length > 0 && (
+                      {Array.isArray(app.candidate_skills) && app.candidate_skills.length > 0 && (
                         <div className="flex flex-wrap gap-2 mb-3">
-                          {app.applicant.skills.slice(0, 5).map((skill, index) => (
+                          {app.candidate_skills.slice(0, 5).map((skill, index) => (
                             <span
                               key={index}
                               className="px-2 py-1 text-xs bg-gray-100 text-gray-700 rounded"
@@ -498,9 +529,9 @@ const EmployerDashboard = () => {
                               {skill}
                             </span>
                           ))}
-                          {app.applicant.skills.length > 5 && (
+                          {app.candidate_skills.length > 5 && (
                             <span className="px-2 py-1 text-xs text-gray-500">
-                              +{app.applicant.skills.length - 5} more
+                              +{app.candidate_skills.length - 5} more
                             </span>
                           )}
                         </div>
@@ -519,22 +550,25 @@ const EmployerDashboard = () => {
                     </div>
 
                     <div className="flex flex-col gap-2 sm:min-w-[140px]">
+                      {/* View Details Button - NEW */}
+                      <button
+                        onClick={() => navigate(`/applications/${app.id}`)}
+                        className="px-4 py-2 bg-gray-600 text-white text-sm rounded-lg hover:bg-gray-700 transition font-medium"
+                      >
+                        {t('dashboard.viewDetails') || 'View Details'}
+                      </button>
+                      
+                      {/* Decision Buttons - Only for PENDING/REVIEWED */}
                       {app.status === 'PENDING' && (
                         <>
                           <button
-                            onClick={() => handleUpdateApplicationStatus(app.id, 'REVIEWED')}
-                            className="px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition font-medium"
-                          >
-                            {t('dashboard.markReviewed') || 'Mark Reviewed'}
-                          </button>
-                          <button
-                            onClick={() => handleUpdateApplicationStatus(app.id, 'ACCEPTED')}
+                            onClick={() => handleAcceptApplication(app.id)}
                             className="px-4 py-2 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700 transition font-medium"
                           >
                             {t('dashboard.accept') || 'Accept'}
                           </button>
                           <button
-                            onClick={() => handleUpdateApplicationStatus(app.id, 'REJECTED')}
+                            onClick={() => handleRejectApplication(app.id)}
                             className="px-4 py-2 bg-red-600 text-white text-sm rounded-lg hover:bg-red-700 transition font-medium"
                           >
                             {t('dashboard.reject') || 'Reject'}
@@ -544,23 +578,28 @@ const EmployerDashboard = () => {
                       {app.status === 'REVIEWED' && (
                         <>
                           <button
-                            onClick={() => handleUpdateApplicationStatus(app.id, 'ACCEPTED')}
+                            onClick={() => handleAcceptApplication(app.id)}
                             className="px-4 py-2 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700 transition font-medium"
                           >
                             {t('dashboard.accept') || 'Accept'}
                           </button>
                           <button
-                            onClick={() => handleUpdateApplicationStatus(app.id, 'REJECTED')}
+                            onClick={() => handleRejectApplication(app.id)}
                             className="px-4 py-2 bg-red-600 text-white text-sm rounded-lg hover:bg-red-700 transition font-medium"
                           >
                             {t('dashboard.reject') || 'Reject'}
                           </button>
                         </>
                       )}
-                      {(app.status === 'ACCEPTED' || app.status === 'REJECTED') && (
-                        <div className="text-sm text-gray-600 text-center py-2">
-                          {t('dashboard.applicationProcessed') || 'Processed'}
-                        </div>
+                      {app.status === 'ACCEPTED' && (
+                        <span className="px-3 py-1 text-sm bg-green-100 text-green-800 rounded text-center">
+                          ✓ {t('dashboard.accepted') || 'Accepted'}
+                        </span>
+                      )}
+                      {app.status === 'REJECTED' && (
+                        <span className="px-3 py-1 text-sm bg-red-100 text-red-800 rounded text-center">
+                          ✗ {t('dashboard.rejected') || 'Rejected'}
+                        </span>
                       )}
                     </div>
                   </div>

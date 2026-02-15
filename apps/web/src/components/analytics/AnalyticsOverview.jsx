@@ -3,10 +3,11 @@
  * Displays key metrics overview.
  */
 import React from 'react';
+import { useI18n } from '../../contexts/I18nContext';
 
 
 const AnalyticsOverview = ({ overview }) => {
-  
+  const { t } = useI18n();
 
   const metrics = [
     {

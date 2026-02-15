@@ -10,10 +10,10 @@ class Settings(BaseSettings):
     """Application settings loaded from environment variables."""
     
     # Database
-    DATABASE_URL: str = Field(default="mariadb+pymysql://green_user:password@localhost/green_matchers")
-    
+    DATABASE_URL: str 
+
     # JWT Authentication
-    JWT_SECRET_KEY: str = Field(default="your-secret-key-change-in-production")
+    JWT_SECRET_KEY: str
     JWT_ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 7  # 7 days
     

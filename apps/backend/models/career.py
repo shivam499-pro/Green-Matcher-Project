@@ -1,10 +1,10 @@
 """
 Green Matchers - Career Model
 """
-from sqlalchemy import Column, Integer, String, Text, Float, DateTime, JSON
+from sqlalchemy import Column, Integer, String, Text, Float, DateTime, JSON, Boolean
 from sqlalchemy.orm import relationship
 from datetime import datetime, timezone
-from utils.db import Base
+from apps.backend.db.base import Base
 
 
 class Career(Base):
@@ -20,7 +20,7 @@ class Career(Base):
     required_skills = Column(JSON, nullable=False)  # Array of skill strings
     
     # SDG (Sustainable Development Goals) tags
-    sdg_tags = Column(JSON, nullable=True)  # Array of SDG goal numbers [7, 8, 13]
+    sdg_tags = Column(JSON, nullable=False, default=[])  # Array of SDG goal numbers [7, 8, 13]
     
     # Salary information
     avg_salary_min = Column(Integer, nullable=True)
@@ -38,6 +38,9 @@ class Career(Base):
     # TODO: migrate to VECTOR / JSONB when DB supports native embeddings
     embedding = Column(String(5000), nullable=True)  # Store as JSON string for compatibility
     
+    # Active status - allows soft deletion and enabling/disabling careers
+    is_active = Column(Boolean, default=True, nullable=False)
+    
     # Timestamps
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
     updated_at = Column(
@@ -51,3 +54,4 @@ class Career(Base):
 
     def __repr__(self):
         return f"<Career(id={self.id}, title={self.title})>"
+

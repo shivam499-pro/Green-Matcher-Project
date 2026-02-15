@@ -5,15 +5,15 @@ API endpoints for analytics and insights.
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 from typing import List, Optional
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
-from core.deps import get_db, get_current_user
-from models.analytics import Analytics
-from models.job import Job
-from models.career import Career
-from models.application import Application
-from models.user import User
-from schemas.analytics import (
+from apps.backend.core.deps import get_db, get_current_user
+from apps.backend.models.analytics import Analytics
+from apps.backend.models.job import Job
+from apps.backend.models.career import Career
+from apps.backend.models.application import Application
+from apps.backend.models.user import User
+from apps.backend.schemas.analytics import (
     CareerDemand,
     SkillPopularity,
     SalaryRange,
@@ -48,7 +48,7 @@ SDG_GOALS = {
 
 
 @router.get("/overview", response_model=AnalyticsOverview)
-async def get_analytics_overview(
+def get_analytics_overview(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
@@ -57,7 +57,7 @@ async def get_analytics_overview(
     """
     # Total counts
     total_users = db.query(User).filter(User.role == "USER").count()
-    total_jobs = db.query(Job).count()
+    total_jobs = db.query(Job).filter(Job.is_verified == True).count()
     total_careers = db.query(Career).count()
     total_applications = db.query(Application).count()
     
@@ -65,8 +65,11 @@ async def get_analytics_overview(
     verified_companies = db.query(Job.employer_id).filter(Job.is_verified == True).distinct().count()
     
     # Active jobs in last 30 days
-    thirty_days_ago = datetime.utcnow() - timedelta(days=30)
-    active_jobs_last_30_days = db.query(Job).filter(Job.created_at >= thirty_days_ago).count()
+    thirty_days_ago = datetime.now(timezone.utc) - timedelta(days=30)
+    active_jobs_last_30_days = db.query(Job).filter(
+        Job.is_verified == True,
+        Job.created_at >= thirty_days_ago
+    ).count()
     
     return AnalyticsOverview(
         total_users=total_users,
@@ -79,7 +82,7 @@ async def get_analytics_overview(
 
 
 @router.get("/career-demand", response_model=List[CareerDemand])
-async def get_career_demand(
+def get_career_demand(
     limit: int = Query(10, ge=1, le=50),
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
@@ -93,10 +96,16 @@ async def get_career_demand(
     
     for career in careers:
         # Count applications for this career
-        application_count = db.query(Application).join(Job).filter(Job.career_id == career.id).count()
+        application_count = db.query(Application).join(Job).filter(
+            Job.career_id == career.id,
+            Job.is_verified == True
+        ).count()
         
         # Count jobs for this career
-        job_count = db.query(Job).filter(Job.career_id == career.id).count()
+        job_count = db.query(Job).filter(
+            Job.career_id == career.id,
+            Job.is_verified == True
+        ).count()
         
         # Calculate demand score (normalized to 0-100)
         max_apps = max(application_count, 1)
@@ -117,7 +126,7 @@ async def get_career_demand(
 
 
 @router.get("/skill-popularity", response_model=List[SkillPopularity])
-async def get_skill_popularity(
+def get_skill_popularity(
     limit: int = Query(20, ge=1, le=100),
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
@@ -159,7 +168,7 @@ async def get_skill_popularity(
 
 
 @router.get("/salary-ranges", response_model=List[SalaryRange])
-async def get_salary_ranges(
+def get_salary_ranges(
     career_id: Optional[int] = Query(None),
     limit: int = Query(20, ge=1, le=50),
     db: Session = Depends(get_db),
@@ -168,7 +177,11 @@ async def get_salary_ranges(
     """
     Get salary range analytics by career.
     """
-    query = db.query(Job).filter(Job.salary_min.isnot(None), Job.salary_max.isnot(None))
+    query = db.query(Job).filter(
+        Job.is_verified == True,
+        Job.salary_min.isnot(None),
+        Job.salary_max.isnot(None)
+    )
     
     if career_id:
         query = query.filter(Job.career_id == career_id)
@@ -209,14 +222,17 @@ async def get_salary_ranges(
 
 
 @router.get("/sdg-distribution", response_model=List[SDGDistribution])
-async def get_sdg_distribution(
+def get_sdg_distribution(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
     """
-    Get SDG goal distribution across all jobs.
+    Get SDG goal distribution across all verified jobs.
     """
-    jobs = db.query(Job).filter(Job.sdg_tags.isnot(None)).all()
+    jobs = db.query(Job).filter(
+        Job.is_verified == True,
+        Job.sdg_tags.isnot(None)
+    ).all()
     sdg_counts = {}
     
     for job in jobs:
@@ -240,7 +256,7 @@ async def get_sdg_distribution(
 
 
 @router.get("/metrics/{metric_name}", response_model=AnalyticsResponse)
-async def get_analytics_metric(
+def get_analytics_metric(
     metric_name: str,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
@@ -261,7 +277,7 @@ async def get_analytics_metric(
 
 
 @router.post("/metrics/{metric_name}/recompute")
-async def recompute_analytics_metric(
+def recompute_analytics_metric(
     metric_name: str,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
@@ -270,20 +286,20 @@ async def recompute_analytics_metric(
     Recompute and store an analytics metric.
     """
     # Only allow admins to recompute
-    if current_user.role != "ADMIN":
+    if current_user.role.value != "ADMIN":
         raise HTTPException(status_code=403, detail="Only admins can recompute metrics")
     
     # Compute the metric based on type
     data = None
     
     if metric_name == "career_demand":
-        data = await get_career_demand(limit=50, db=db, current_user=current_user)
+        data = get_career_demand(limit=50, db=db, current_user=current_user)
     elif metric_name == "skill_popularity":
-        data = await get_skill_popularity(limit=100, db=db, current_user=current_user)
+        data = get_skill_popularity(limit=100, db=db, current_user=current_user)
     elif metric_name == "salary_ranges":
-        data = await get_salary_ranges(limit=50, db=db, current_user=current_user)
+        data = get_salary_ranges(limit=50, db=db, current_user=current_user)
     elif metric_name == "sdg_distribution":
-        data = await get_sdg_distribution(db=db, current_user=current_user)
+        data = get_sdg_distribution(db=db, current_user=current_user)
     else:
         raise HTTPException(status_code=400, detail="Unknown metric name")
     
@@ -292,7 +308,7 @@ async def recompute_analytics_metric(
     
     if existing:
         existing.metric_value = [d.model_dump() for d in data] if hasattr(data, '__iter__') else data
-        existing.computed_at = datetime.utcnow()
+        existing.computed_at = datetime.now(timezone.utc)
     else:
         new_metric = Analytics(
             metric_name=metric_name,

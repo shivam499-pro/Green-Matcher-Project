@@ -1,13 +1,14 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 
 import { jobsAPI, applicationsAPI } from '../utils/api';
-import { t } from '../utils/translations';
+import { useI18n } from '../contexts/I18nContext';
 
 const JobDetail = () => {
   
   const { id } = useParams();
   const navigate = useNavigate();
+  const { t } = useI18n();
   const [loading, setLoading] = useState(true);
   const [job, setJob] = useState(null);
   const [error, setError] = useState(null);
@@ -15,22 +16,37 @@ const JobDetail = () => {
   const [applying, setApplying] = useState(false);
   const [coverLetter, setCoverLetter] = useState('');
   const [applicationMessage, setApplicationMessage] = useState({ type: '', text: '' });
+  const [isSaved, setIsSaved] = useState(false);
+  const [similarJobs, setSimilarJobs] = useState([]);
 
-  useEffect(() => {
-    fetchJob();
-  }, [id]);
-
-  const fetchJob = async () => {
+  const fetchJob = useCallback(async () => {
     try {
       const response = await jobsAPI.getJob(id);
       setJob(response.data);
+      
+      // Fetch similar jobs based on the current job
+      if (response.data.career_id) {
+        try {
+          const similarResponse = await jobsAPI.listJobs({ career_id: response.data.career_id, limit: 4 });
+          const similar = (similarResponse.data.items || similarResponse.data || [])
+            .filter(j => j.id !== parseInt(id))
+            .slice(0, 3);
+          setSimilarJobs(similar);
+        } catch (e) {
+          console.log('Could not fetch similar jobs');
+        }
+      }
     } catch (error) {
       console.error('Error fetching job:', error);
-      setError(t('jobDetail.fetchError') || 'Failed to load job details');
+      setError(t('job_detail.fetch_error', 'Failed to load job details'));
     } finally {
       setLoading(false);
     }
-  };
+  }, [id, t]);
+
+  useEffect(() => {
+    fetchJob();
+  }, [fetchJob]);
 
   const handleApply = async (e) => {
     e.preventDefault();
@@ -44,21 +60,39 @@ const JobDetail = () => {
       });
       setApplicationMessage({
         type: 'success',
-        text: t('jobDetail.applySuccess') || 'Application submitted successfully!'
+        text: t('job_detail.apply_success', 'Application submitted successfully!')
       });
       setShowApplyModal(false);
       setCoverLetter('');
     } catch (error) {
       console.error('Error applying:', error);
+      if (error.response?.status === 401) {
+        navigate('/login');
+        return;
+      }
       const errorMessage = error.response?.data?.detail || 
                         error.message || 
-                        (t('jobDetail.applyError') || 'Failed to submit application');
+                        t('job_detail.apply_error', 'Failed to submit application');
       setApplicationMessage({
         type: 'error',
         text: errorMessage
       });
     } finally {
       setApplying(false);
+    }
+  };
+
+  const handleSaveToggle = async () => {
+    try {
+      if (isSaved) {
+        await jobsAPI.unsaveJob(id);
+        setIsSaved(false);
+      } else {
+        await jobsAPI.saveJob(id);
+        setIsSaved(true);
+      }
+    } catch (error) {
+      console.error('Error toggling save:', error);
     }
   };
 
@@ -73,6 +107,9 @@ const JobDetail = () => {
     };
     return colors[sdgId] || 'bg-gray-500';
   };
+
+  // Helper to check if job is open for applications
+  const isJobOpen = job.status === 'OPEN';
 
   if (loading) {
     return (
@@ -132,7 +169,7 @@ const JobDetail = () => {
             <div className="flex-1">
               <div className="flex items-center gap-3 mb-2">
                 <h1 className="text-3xl font-bold text-gray-900">{job.title}</h1>
-                {job.is_verified && (
+                {job.is_verified === true && (
                   <span className="inline-flex items-center px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded">
                     <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
@@ -159,13 +196,13 @@ const JobDetail = () => {
                     <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
-                    ₹{job.salary_min.toLocaleString()} - ₹{job.salary_max.toLocaleString()}/year
+                    ₹{Number(job.salary_min).toLocaleString()} - ₹{Number(job.salary_max).toLocaleString()}/year
                   </span>
                 )}
               </div>
 
               {/* SDG Tags */}
-              {job.sdg_tags && job.sdg_tags.length > 0 && (
+              {Array.isArray(job.sdg_tags) && job.sdg_tags.length > 0 && (
                 <div className="flex flex-wrap gap-2">
                   {job.sdg_tags.map((sdg) => (
                     <span
@@ -181,10 +218,15 @@ const JobDetail = () => {
 
             {/* Apply Button */}
             <button
-              onClick={() => setShowApplyModal(true)}
-              className="px-8 py-3 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors font-medium whitespace-nowrap"
+              onClick={() => isJobOpen && setShowApplyModal(true)}
+              disabled={!isJobOpen || applying}
+              className={`px-8 py-3 rounded-lg font-medium whitespace-nowrap
+                ${isJobOpen
+                  ? 'bg-emerald-600 text-white hover:bg-emerald-700'
+                  : 'bg-gray-300 text-gray-600 cursor-not-allowed'
+                }`}
             >
-              {t('Apply Now')}
+              {isJobOpen ? t('Apply Now') : t('Position Filled')}
             </button>
           </div>
         </div>
@@ -236,7 +278,7 @@ const JobDetail = () => {
                   </a>
                 )}
               </div>
-              {job.employer.is_verified && (
+              {job.employer?.is_verified === true && (
                 <span className="inline-flex items-center px-3 py-1 text-sm font-medium bg-green-100 text-green-800 rounded">
                   <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />

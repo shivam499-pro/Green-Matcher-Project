@@ -2,14 +2,14 @@
  * Green Matchers - Analytics Page
  * Displays all analytics and insights.
  */
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 
 import AnalyticsOverview from '../components/analytics/AnalyticsOverview';
 import CareerDemandChart from '../components/analytics/CareerDemandChart';
 import SkillPopularityChart from '../components/analytics/SkillPopularityChart';
 import SalaryRangeChart from '../components/analytics/SalaryRangeChart';
-import { t } from '../utils/translations';
 import SDGDistributionChart from '../components/analytics/SDGDistributionChart';
+import { useI18n } from '../contexts/I18nContext';
 import {
   getAnalyticsOverview,
   getCareerDemand,
@@ -20,6 +20,7 @@ import {
 
 const Analytics = () => {
   
+  const { t } = useI18n();
   const [loading, setLoading] = useState(true);
   const [overview, setOverview] = useState(null);
   const [careerDemand, setCareerDemand] = useState([]);
@@ -27,12 +28,9 @@ const Analytics = () => {
   const [salaryRanges, setSalaryRanges] = useState([]);
   const [sdgDistribution, setSdgDistribution] = useState([]);
   const [error, setError] = useState(null);
+  const [lastUpdated, setLastUpdated] = useState(null);
 
-  useEffect(() => {
-    fetchAnalytics();
-  }, []);
-
-  const fetchAnalytics = async () => {
+  const fetchAnalytics = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -50,20 +48,25 @@ const Analytics = () => {
       setSkillPopularity(skillData);
       setSalaryRanges(salaryData);
       setSdgDistribution(sdgData);
+      setLastUpdated(new Date());
     } catch (err) {
       console.error('Error fetching analytics:', err);
-      setError(t('Error loading analytics data'));
+      setError(t('analytics.load_error', 'Error loading analytics data'));
     } finally {
       setLoading(false);
     }
-  };
+  }, [t]);
+
+  useEffect(() => {
+    fetchAnalytics();
+  }, [fetchAnalytics]);
 
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">{t('Loading analytics data...')}</p>
+          <p className="text-gray-600">{t('analytics.loading', 'Loading analytics data...')}</p>
         </div>
       </div>
     );
@@ -78,7 +81,7 @@ const Analytics = () => {
             onClick={fetchAnalytics}
             className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors"
           >
-            {t('Retry')}
+            {t('common.retry', 'Retry')}
           </button>
         </div>
       </div>
@@ -92,8 +95,13 @@ const Analytics = () => {
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="flex justify-between items-center">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">{t('Analytics')}</h1>
-              <p className="text-gray-600 mt-1">{t('View platform insights and trends')}</p>
+              <h1 className="text-3xl font-bold text-gray-900">{t('analytics.title', 'Analytics')}</h1>
+              <p className="text-gray-600 mt-1">{t('analytics.subtitle', 'View platform insights and trends')}</p>
+              {lastUpdated && (
+                <p className="text-sm text-gray-400 mt-1">
+                  {t('analytics.last_updated', 'Last updated')}: {lastUpdated.toLocaleTimeString()}
+                </p>
+              )}
             </div>
             <button
               onClick={fetchAnalytics}
@@ -102,7 +110,7 @@ const Analytics = () => {
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
               </svg>
-              {t('analytics.refresh')}
+              {t('analytics.refresh', 'Refresh')}
             </button>
           </div>
         </div>

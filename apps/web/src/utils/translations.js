@@ -1,101 +1,112 @@
 /**
- * Simple translation utility
- * Returns the text as-is for now (can be enhanced later for i18n)
+ * Translation utility for Green Matchers
+ * This file provides a simple translation function for use outside of React components
+ * For React components, use the useI18n hook from contexts/I18nContext
  */
-export const t = (key, fallback) => {
-  // If a fallback is provided, use it
-  if (fallback !== undefined) {
-    return fallback;
+
+import { STORAGE_KEYS } from '@/config/constants';
+
+// Import translations directly
+import en from '../translations/en.json';
+import hi from '../translations/hi.json';
+import ta from '../translations/ta.json';
+
+const translations = { en, hi, ta };
+
+/**
+ * Get the current language from localStorage or default to 'en'
+ */
+function getCurrentLanguage() {
+  if (typeof window !== 'undefined') {
+    const saved = localStorage.getItem(STORAGE_KEYS.LANGUAGE);
+    return saved && translations[saved] ? saved : 'en';
   }
+  return 'en';
+}
 
-  // Simple key-to-text mapping for common translations
-  const translations = {
-    // Auth
-    'Login': 'Login',
-    'SignIn': 'Sign In',
-    'Register': 'Register',
-    'SignUp': 'Sign Up',
-    'EmailAddress': 'Email Address',
-    'Enter your password': 'Enter your password',
-    'ConfirmPassword': 'Confirm Password',
-    'FullName': 'Full Name',
-    'SelectRole': 'Select Role',
-    'Already have an account?': 'Already have an account?',
-    'LoginHere': 'Login here',
-    'No account yet?': "Don't have an account?",
-    'RegisterHere': 'Register here',
-    'BackToHome': 'Back to Home',
-    'auth.jobSeeker': 'Job Seeker',
-    'auth.employer': 'Employer',
-
-    // Common
-    'common.loading': 'Loading...',
-
-    // Errors
-    'errors.passwordMismatch': 'Passwords do not match',
-    'errors.somethingWentWrong': 'Something went wrong. Please try again.',
-    'errors.invalidCredentials': 'Invalid email or password',
-
-    // Jobs
-    'Green Jobs': 'Green Jobs',
-    'Search': 'Search',
-    'Filters': 'Filters',
-    'Location': 'Location',
-    'All SDGs': 'All SDGs',
-    'Clear Filters': 'Clear Filters',
-    'No jobs found': 'No jobs found',
-    'Try adjusting your search or filters': 'Try adjusting your search or filters',
-    'Verified': 'Verified',
-    'Save': 'Save',
-    'View Details': 'View Details',
-    'jobs.fetchError': 'Failed to load jobs',
-    'jobs.searchPlaceholder': 'Search jobs by title, skills, or keywords...',
-    'jobs.locationPlaceholder': 'e.g., Mumbai, Delhi',
-    'jobs.minSalary': 'Minimum Salary (₹/year)',
-    'jobs.subtitle': 'Find your next opportunity in the green economy',
-    'jobs.showingResults': 'Showing {count} jobs',
-
-    // Careers
-    'Green Careers': 'Green Careers',
-    'Explore sustainable career paths in the green economy': 'Explore sustainable career paths in the green economy',
-    'careers.allSDGs': 'All SDGs',
-    'careers.searchPlaceholder': 'Search careers by title, skills, or keywords...',
-    'careers.showingResults': 'Showing {count} career(s)',
-    'No Careers Found': 'No Careers Found',
-    'careers.fetchError': 'Failed to load careers. Please try again.',
-    'careers.searchError': 'Failed to search careers. Please try again.',
-    'Required Skills': 'Required Skills',
-    'Career Demand': 'Career Demand',
-    'Try adjusting your filters or search criteria': 'Try adjusting your filters or search criteria',
-    'No careers available at the moment': 'No careers available at the moment',
-
-    // Job Detail
-    'jobDetail.fetchError': 'Failed to load job details',
-
-    // Dashboard
-    'dashboard.fetchError': 'Failed to load data. Please try again.',
-    'dashboard.titleRequired': 'Job title is required',
-    'dashboard.descriptionRequired': 'Job description is required',
-    'dashboard.locationRequired': 'Location is required',
-    'dashboard.validMinSalary': 'Please enter a valid minimum salary',
-    'dashboard.validMaxSalary': 'Please enter a valid maximum salary',
-    'dashboard.salaryRangeError': 'Maximum salary must be greater than minimum salary',
-    'dashboard.createJobError': 'Failed to create job. Please try again.',
-    'dashboard.deleteJobError': 'Failed to delete job. Please try again.',
-    'dashboard.updateApplicationError': 'Failed to update application. Please try again.',
-
-    // Applicant View
-    'applicantView.invalidId': 'Invalid applicant ID',
-
-    // Admin
-    'admin.fetchError': 'Failed to load data. Please try again.',
-    'admin.verifyJobError': 'Failed to verify job. Please try again.',
-    'admin.deleteJobError': 'Failed to delete job. Please try again.',
-    'admin.deleteCareerError': 'Failed to delete career. Please try again.',
-
-    // Analytics
-    'Error loading analytics data': 'Error loading analytics data',
-  };
-
-  return translations[key] || key;
+/**
+ * Get translation by key path
+ * @param {string} keyPath - Dot-separated key path (e.g., 'nav.home')
+ * @param {object} params - Parameters to replace in the translation
+ * @param {string} lang - Language code (optional, defaults to current language)
+ * @returns {string} - Translated string
+ */
+export const t = (keyPath, params = {}, lang = null) => {
+  const language = lang || getCurrentLanguage();
+  const keys = keyPath.split('.');
+  
+  // Try to get translation from current language
+  let value = translations[language];
+  for (const key of keys) {
+    if (value && typeof value === 'object' && key in value) {
+      value = value[key];
+    } else {
+      // Fallback to English
+      value = translations.en;
+      for (const k of keys) {
+        if (value && typeof value === 'object' && k in value) {
+          value = value[k];
+        } else {
+          return keyPath;
+        }
+      }
+      break;
+    }
+  }
+  
+  // If value is not a string, return key path
+  if (typeof value !== 'string') {
+    return keyPath;
+  }
+  
+  // Replace parameters
+  let result = value;
+  Object.keys(params).forEach(param => {
+    result = result.replace(new RegExp(`\\{${param}\\}`, 'g'), params[param]);
+  });
+  
+  return result;
 };
+
+/**
+ * Get all translations for a specific language
+ * @param {string} lang - Language code
+ * @returns {object} - All translations for the language
+ */
+export const getTranslations = (lang = 'en') => {
+  return translations[lang] || translations.en;
+};
+
+/**
+ * Check if a translation exists
+ * @param {string} keyPath - Dot-separated key path
+ * @param {string} lang - Language code (optional)
+ * @returns {boolean} - Whether the translation exists
+ */
+export const hasTranslation = (keyPath, lang = null) => {
+  const language = lang || getCurrentLanguage();
+  const keys = keyPath.split('.');
+  let value = translations[language];
+  
+  for (const key of keys) {
+    if (value && typeof value === 'object' && key in value) {
+      value = value[key];
+    } else {
+      return false;
+    }
+  }
+  
+  return typeof value === 'string';
+};
+
+/**
+ * Get available languages
+ * @returns {Array} - Array of language objects with code and name
+ */
+export const getAvailableLanguages = () => [
+  { code: 'en', name: 'English' },
+  { code: 'hi', name: 'हिंदी' },
+  { code: 'ta', name: 'தமிழ்' },
+];
+
+export default { t, getTranslations, hasTranslation, getAvailableLanguages };

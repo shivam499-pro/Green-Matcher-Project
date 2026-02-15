@@ -10,6 +10,8 @@ from .saved_job import SavedJob
 from .job_alert import JobAlert
 from .notification import Notification
 from .browse_history import BrowseHistory
+from .resume import Resume
+from .user_skill import UserSkill
 
 __all__ = [
     "User",
@@ -23,4 +25,6 @@ __all__ = [
     "JobAlert",
     "Notification",
     "BrowseHistory",
+    "Resume",
+    "UserSkill",
 ]

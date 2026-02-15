@@ -15,6 +15,8 @@ import AdminDashboard from './pages/AdminDashboard';
 import Careers from './pages/Careers';
 import Analytics from './pages/Analytics';
 import ApplicantView from './pages/ApplicantView';
+import Settings from './pages/Settings';
+import SavedJobs from './pages/SavedJobs';
 
 /**
  * Green Matchers - Main App Component
@@ -58,6 +60,22 @@ function App() {
             element={
               <ProtectedRoute requiredRole="USER">
                 <Recommendations />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/saved-jobs" 
+            element={
+              <ProtectedRoute requiredRole="USER">
+                <SavedJobs />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/settings" 
+            element={
+              <ProtectedRoute>
+                <Settings />
               </ProtectedRoute>
             } 
           />

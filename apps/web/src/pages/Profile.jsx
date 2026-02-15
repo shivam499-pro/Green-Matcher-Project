@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
+import { useI18n } from '../contexts/I18nContext';
 import { userAPI } from '../utils/api';
-import { t } from '../utils/i18n';
 
 const Profile = () => {
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(true);
+  const { t, language, setLanguage } = useI18n();
+  const { user, updateProfile, updateSkills, loading: authLoading } = useAuth();
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState({ type: '', text: '' });
   const [profile, setProfile] = useState({
@@ -17,6 +19,21 @@ const Profile = () => {
     resume_url: '',
     language: 'en',
   });
+
+  // Initialize profile from user data in AuthContext
+  useEffect(() => {
+    if (user) {
+      setProfile({
+        full_name: user.full_name || '',
+        email: user.email || '',
+        bio: user.bio || '',
+        location: user.location || '',
+        skills: user.skills || [],
+        resume_url: user.resume_url || '',
+        language: user.language || language || 'en',
+      });
+    }
+  }, [user, language]);
 
   // Available skills for selection
   const availableSkills = [
@@ -40,30 +57,6 @@ const Profile = () => {
     'Time Management', 'Creativity', 'Analytical Skills',
   ];
 
-  useEffect(() => {
-    fetchProfile();
-  }, []);
-
-  const fetchProfile = async () => {
-    try {
-      const response = await userAPI.getProfile();
-      setProfile({
-        full_name: response.data.full_name || '',
-        email: response.data.email || '',
-        bio: response.data.bio || '',
-        location: response.data.location || '',
-        skills: response.data.skills || [],
-        resume_url: response.data.resume_url || '',
-        language: response.data.language || 'en',
-      });
-    } catch (error) {
-      console.error('Error fetching profile:', error);
-      setMessage({ type: 'error', text: 'Failed to load profile' });
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const handleChange = (e) => {
     const { name, value } = e.target;
     setProfile(prev => ({ ...prev, [name]: value }));
@@ -84,22 +77,26 @@ const Profile = () => {
     setMessage({ type: '', text: '' });
 
     try {
-      await userAPI.updateProfile({
+      // Update profile using AuthContext
+      await updateProfile({
         full_name: profile.full_name,
-        bio: profile.bio,
-        location: profile.location,
         language: profile.language,
       });
 
-      // Update skills separately - send array directly, not object
+      // Update skills separately
       if (profile.skills.length > 0) {
-        await userAPI.updateSkills(profile.skills);
+        await updateSkills(profile.skills);
       }
 
-      setMessage({ type: 'success', text: t('Profile updated successfully!') });
+      // Sync language with I18nContext if changed
+      if (profile.language !== language) {
+        setLanguage(profile.language);
+      }
+
+      setMessage({ type: 'success', text: t('profile.updateSuccess', 'Profile updated successfully!') });
     } catch (error) {
       console.error('Error updating profile:', error);
-      setMessage({ type: 'error', text: t('Failed to update profile') });
+      setMessage({ type: 'error', text: t('profile.updateFailed', 'Failed to update profile') });
     } finally {
       setSaving(false);
     }
@@ -115,19 +112,19 @@ const Profile = () => {
     try {
       const response = await userAPI.uploadResume(formData);
       setProfile(prev => ({ ...prev, resume_url: response.data.resume_url }));
-      setMessage({ type: 'success', text: t('Resume uploaded successfully!') });
+      setMessage({ type: 'success', text: t('profile.resumeUploadSuccess', 'Resume uploaded successfully!') });
     } catch (error) {
       console.error('Error uploading resume:', error);
-      setMessage({ type: 'error', text: t('Failed to upload resume') });
+      setMessage({ type: 'error', text: t('profile.resumeUploadFailed', 'Failed to upload resume') });
     }
   };
 
-  if (loading) {
+  if (authLoading) {
     return (
       <div className="flex-1 flex items-center justify-center bg-gray-50">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">{t('Loading...')}</p>
+          <p className="mt-4 text-gray-600">{t('common.loading', 'Loading...')}</p>
         </div>
       </div>
     );
@@ -138,8 +135,8 @@ const Profile = () => {
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">{t('My Profile')}</h1>
-          <p className="mt-2 text-gray-600">{t('Manage your profile and skills')}</p>
+          <h1 className="text-3xl font-bold text-gray-900">{t('profile.title', 'My Profile')}</h1>
+          <p className="mt-2 text-gray-600">{t('profile.subtitle', 'Manage your profile and skills')}</p>
         </div>
 
         {/* Message */}
@@ -156,14 +153,14 @@ const Profile = () => {
           {/* Basic Information */}
           <div className="bg-white rounded-lg p-6 border border-gray-200">
             <h2 className="text-xl font-semibold text-gray-900 mb-4">
-              {t('Basic Information')}
+              {t('profile.basicInfo', 'Basic Information')}
             </h2>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Full Name */}
               <div>
                 <label htmlFor="full_name" className="block text-sm font-medium text-gray-700 mb-2">
-                  {t('Full Name')}
+                  {t('profile.fullName', 'Full Name')}
                 </label>
                 <input
                   type="text"
@@ -179,7 +176,7 @@ const Profile = () => {
               {/* Email (Read-only) */}
               <div>
                 <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-                  {t('Email Address')}
+                  {t('profile.email', 'Email Address')}
                 </label>
                 <input
                   type="email"
@@ -194,7 +191,7 @@ const Profile = () => {
               {/* Location */}
               <div>
                 <label htmlFor="location" className="block text-sm font-medium text-gray-700 mb-2">
-                  {t('Location')}
+                  {t('profile.location', 'Location')}
                 </label>
                 <input
                   type="text"
@@ -202,7 +199,7 @@ const Profile = () => {
                   name="location"
                   value={profile.location}
                   onChange={handleChange}
-                  placeholder={t('Enter your location') || 'e.g., Mumbai, India'}
+                  placeholder={t('profile.locationPlaceholder', 'e.g., Mumbai, India')}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
                 />
               </div>
@@ -210,7 +207,7 @@ const Profile = () => {
               {/* Language */}
               <div>
                 <label htmlFor="language" className="block text-sm font-medium text-gray-700 mb-2">
-                  {t('Preferred Language')}
+                  {t('profile.preferredLanguage', 'Preferred Language')}
                 </label>
                 <select
                   id="language"
@@ -222,9 +219,6 @@ const Profile = () => {
                   <option value="en">English</option>
                   <option value="hi">हिंदी (Hindi)</option>
                   <option value="ta">தமிழ் (Tamil)</option>
-                  <option value="te">తెలుగు (Telugu)</option>
-                  <option value="bn">বাংলা (Bengali)</option>
-                  <option value="mr">मराठी (Marathi)</option>
                 </select>
               </div>
             </div>
@@ -232,7 +226,7 @@ const Profile = () => {
             {/* Bio */}
             <div className="mt-6">
               <label htmlFor="bio" className="block text-sm font-medium text-gray-700 mb-2">
-                {t('About Me')}
+                {t('profile.aboutMe', 'About Me')}
               </label>
               <textarea
                 id="bio"
@@ -240,7 +234,7 @@ const Profile = () => {
                 value={profile.bio}
                 onChange={handleChange}
                 rows={4}
-                placeholder={t('Tell us about yourself...')}
+                placeholder={t('profile.bioPlaceholder', 'Tell us about yourself...')}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
               />
             </div>
@@ -249,17 +243,17 @@ const Profile = () => {
           {/* Skills */}
           <div className="bg-white rounded-lg p-6 border border-gray-200">
             <h2 className="text-xl font-semibold text-gray-900 mb-4">
-              {t('Skills')}
+              {t('profile.skills', 'Skills')}
             </h2>
             <p className="text-sm text-gray-600 mb-4">
-              {t('Select your skills from list below')}
+              {t('profile.skillsDescription', 'Select your skills from the list below')}
             </p>
 
             {/* Selected Skills */}
             {profile.skills.length > 0 && (
               <div className="mb-4">
                 <h3 className="text-sm font-medium text-gray-700 mb-2">
-                  {t('Selected Skills')} ({profile.skills.length})
+                  {t('profile.selectedSkills', 'Selected Skills')} ({profile.skills.length})
                 </h3>
                 <div className="flex flex-wrap gap-2">
                   {profile.skills.map(skill => (
@@ -284,7 +278,7 @@ const Profile = () => {
             {/* Available Skills */}
             <div>
               <h3 className="text-sm font-medium text-gray-700 mb-2">
-                {t('Available Skills')}
+                {t('profile.availableSkills', 'Available Skills')}
               </h3>
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 max-h-64 overflow-y-auto">
                 {availableSkills.map(skill => (
@@ -308,7 +302,7 @@ const Profile = () => {
           {/* Resume */}
           <div className="bg-white rounded-lg p-6 border border-gray-200">
             <h2 className="text-xl font-semibold text-gray-900 mb-4">
-              {t('profile.resume') || 'Resume'}
+              {t('profile.resume', 'Resume')}
             </h2>
 
             {profile.resume_url ? (
@@ -318,14 +312,14 @@ const Profile = () => {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                   </svg>
                   <div>
-                    <p className="text-sm font-medium text-green-800">{t('Resume uploaded')}</p>
+                    <p className="text-sm font-medium text-green-800">{t('profile.resumeUploaded', 'Resume uploaded')}</p>
                     <a href={profile.resume_url} target="_blank" rel="noopener noreferrer" className="text-sm text-green-600 hover:underline">
-                      {t('View resume')}
+                      {t('profile.viewResume', 'View resume')}
                     </a>
                   </div>
                 </div>
                 <label className="cursor-pointer px-4 py-2 bg-white text-green-600 border border-green-600 rounded-lg hover:bg-green-50 transition-colors">
-                  {t('Update Resume')}
+                  {t('profile.updateResume', 'Update Resume')}
                   <input type="file" accept=".pdf,.doc,.docx" onChange={handleResumeUpload} className="hidden" />
                 </label>
               </div>
@@ -334,9 +328,9 @@ const Profile = () => {
                 <svg className="w-12 h-12 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
                 </svg>
-                <p className="text-sm text-gray-600 mb-4">{t('Upload your resume')}</p>
+                <p className="text-sm text-gray-600 mb-4">{t('profile.uploadResume', 'Upload your resume')}</p>
                 <label className="cursor-pointer px-6 py-3 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors">
-                  {t('Choose File')}
+                  {t('profile.chooseFile', 'Choose File')}
                   <input type="file" accept=".pdf,.doc,.docx" onChange={handleResumeUpload} className="hidden" />
                 </label>
               </div>
@@ -347,17 +341,17 @@ const Profile = () => {
           <div className="flex justify-end space-x-4">
             <button
               type="button"
-              onClick={() => navigate('/')}
+              onClick={() => navigate('/dashboard')}
               className="px-6 py-3 bg-white text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
             >
-              {t('Cancel')}
+              {t('common.cancel', 'Cancel')}
             </button>
             <button
               type="submit"
               disabled={saving}
               className="px-6 py-3 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {saving ? t('Saving...') : t('Save Profile')}
+              {saving ? t('common.saving', 'Saving...') : t('profile.saveProfile', 'Save Profile')}
             </button>
           </div>
         </form>

@@ -4,10 +4,10 @@ Green Matchers - Careers Routes
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from typing import Optional, List
-from core.deps import DatabaseSession, get_current_user
-from models.career import Career
-from models.user import User
-from schemas.career import CareerCreate, CareerUpdate, CareerResponse, CareerDetailResponse
+from apps.backend.core.deps import DatabaseSession, get_current_user
+from apps.backend.models.career import Career
+from apps.backend.models.user import User
+from apps.backend.schemas.career import CareerCreate, CareerUpdate, CareerResponse, CareerDetailResponse
 
 router = APIRouter()
 

@@ -3,10 +3,11 @@ Green Matchers - Authentication Routes
 """
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-from core.security import verify_password, get_password_hash, create_access_token
-from core.deps import DatabaseSession
-from models.user import User, UserRole
-from schemas.user import UserRegister, UserLogin, UserResponse, TokenResponse
+from datetime import datetime, timezone
+from apps.backend.core.security import verify_password, get_password_hash, create_access_token
+from apps.backend.core.deps import DatabaseSession
+from apps.backend.models.user import User, UserRole
+from apps.backend.schemas.user import UserRegister, UserLogin, UserResponse, TokenResponse
 
 router = APIRouter()
 
@@ -37,7 +38,8 @@ def register(user_data: UserRegister, db: DatabaseSession):
         password_hash=get_password_hash(user_data.password),
         full_name=user_data.full_name,
         role=UserRole.USER,  # Always USER - no client control
-        language=user_data.language
+        language=user_data.language,
+        created_at=datetime.now(timezone.utc)
     )
     
     db.add(new_user)
@@ -63,6 +65,10 @@ def login(credentials: UserLogin, db: DatabaseSession):
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid email or password"
         )
+    
+    # Update last login timestamp
+    user.last_login = datetime.now(timezone.utc)
+    db.commit()
     
     # Create access token with consistent field names
     access_token = create_access_token(

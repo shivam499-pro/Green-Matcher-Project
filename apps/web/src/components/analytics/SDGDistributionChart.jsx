@@ -3,6 +3,7 @@
  * Displays SDG goal distribution across jobs.
  */
 import React from 'react';
+import { useI18n } from '../../contexts/I18nContext';
 
 
 const SDG_COLORS = {
@@ -26,7 +27,7 @@ const SDG_COLORS = {
 };
 
 const SDGDistributionChart = ({ sdgDistribution }) => {
-  
+  const { t } = useI18n();
 
   if (!sdgDistribution || sdgDistribution.length === 0) {
     return (

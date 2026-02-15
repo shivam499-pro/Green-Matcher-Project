@@ -1,41 +1,75 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { useI18n } from '../contexts/I18nContext';
 
 /**
  * Green Matchers - Landing Page
  * Simple, clean landing page with proper sizing and clean colors.
  */
 const Landing = () => {
+  const { t } = useI18n();
+  const [animatedStats, setAnimatedStats] = useState({
+    jobs: 0,
+    companies: 0,
+    careers: 0
+  });
+
+  // Animate stats on mount
+  useEffect(() => {
+    const targetStats = { jobs: 150, companies: 45, careers: 30 };
+    const duration = 2000;
+    const steps = 50;
+    const interval = duration / steps;
+    
+    let currentStep = 0;
+    const timer = setInterval(() => {
+      currentStep++;
+      const progress = currentStep / steps;
+      setAnimatedStats({
+        jobs: Math.floor(targetStats.jobs * progress),
+        companies: Math.floor(targetStats.companies * progress),
+        careers: Math.floor(targetStats.careers * progress)
+      });
+      
+      if (currentStep >= steps) {
+        clearInterval(timer);
+        setAnimatedStats(targetStats);
+      }
+    }, interval);
+    
+    return () => clearInterval(timer);
+  }, []);
+
   const features = [
     {
       icon: '🤖',
-      title: 'AI-Powered Matching',
-      description: 'AI-powered, skill-based job matching introduction'
+      title: t('features.ai_matching.title', 'AI-Powered Matching'),
+      description: t('features.ai_matching.description', 'AI-powered, skill-based job matching introduction')
     },
     {
       icon: '🌍',
-      title: 'Green Jobs Focus',
-      description: 'SDG-aligned job opportunities for sustainable careers'
+      title: t('features.green_jobs.title', 'Green Jobs Focus'),
+      description: t('features.green_jobs.description', 'SDG-aligned job opportunities for sustainable careers')
     },
     {
       icon: '🎯',
-      title: 'Skill-Based',
-      description: 'Find careers based on your skills, not just keywords'
+      title: t('features.skill_based.title', 'Skill-Based'),
+      description: t('features.skill_based.description', 'Find careers based on your skills, not just keywords')
     },
     {
       icon: '🌱',
-      title: 'SDG Aligned',
-      description: 'All jobs tagged with UN Sustainable Development Goals'
+      title: t('features.sdg_aligned.title', 'SDG Aligned'),
+      description: t('features.sdg_aligned.description', 'All jobs tagged with UN Sustainable Development Goals')
     },
     {
       icon: '📊',
-      title: 'Smart Analytics',
-      description: 'Career demand, skill popularity, and salary insights'
+      title: t('features.analytics.title', 'Smart Analytics'),
+      description: t('features.analytics.description', 'Career demand, skill popularity, and salary insights')
     },
     {
       icon: '🚀',
-      title: 'Fast & Simple',
-      description: 'Quick job search and application process'
+      title: t('features.fast.title', 'Fast & Simple'),
+      description: t('features.fast.description', 'Quick job search and application process')
     },
   ];
 
@@ -48,11 +82,11 @@ const Landing = () => {
             <main className="mt-10 mx-auto max-w-7xl sm:mt-12 md:mt-16 lg:mt-20 xl:mt-28">
               <div className="sm:text-center lg:text-left">
                 <h1 className="text-4xl tracking-tight font-extrabold text-gray-900 sm:text-5xl md:text-6xl">
-                  <span className="block xl:inline">Find Your Dream</span>
-                  <span className="block text-emerald-600 xl:inline">Green Job</span>
+                  <span className="block xl:inline">{t('landing.find_dream', 'Find Your Dream')}</span>
+                  <span className="block text-emerald-600 xl:inline">{t('landing.green_job', 'Green Job')}</span>
                 </h1>
                 <p className="mt-3 text-base text-gray-500 sm:mt-5 sm:text-lg sm:max-w-xl sm:mx-auto md:mt-5 md:text-xl lg:mx-0">
-                  India's first AI-native green jobs platform. Discover sustainable career opportunities powered by semantic intelligence.
+                  {t('landing.tagline', "India's first AI-native green jobs platform. Discover sustainable career opportunities powered by semantic intelligence.")}
                 </p>
                 <div className="mt-5 sm:mt-8 sm:flex sm:justify-center lg:justify-start">
                   <div className="rounded-md shadow">
@@ -60,7 +94,7 @@ const Landing = () => {
                       to="/register"
                       className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-emerald-600 hover:bg-emerald-700 md:py-4 md:text-lg md:px-10"
                     >
-                      Get Started
+                      {t('landing.get_started', 'Get Started')}
                     </Link>
                   </div>
                   <div className="mt-3 sm:mt-0 sm:ml-3">
@@ -68,7 +102,7 @@ const Landing = () => {
                       to="/jobs"
                       className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-emerald-700 bg-emerald-100 hover:bg-emerald-200 md:py-4 md:text-lg md:px-10"
                     >
-                      Browse Jobs
+                      {t('landing.browse_jobs', 'Browse Jobs')}
                     </Link>
                   </div>
                 </div>
@@ -78,18 +112,38 @@ const Landing = () => {
         </div>
       </div>
 
+      {/* Stats Section */}
+      <div className="bg-emerald-600 py-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-3 gap-8 text-center">
+            <div>
+              <p className="text-3xl font-bold text-white">{animatedStats.jobs}+</p>
+              <p className="text-emerald-100">{t('landing.stats.jobs', 'Active Jobs')}</p>
+            </div>
+            <div>
+              <p className="text-3xl font-bold text-white">{animatedStats.companies}+</p>
+              <p className="text-emerald-100">{t('landing.stats.companies', 'Companies')}</p>
+            </div>
+            <div>
+              <p className="text-3xl font-bold text-white">{animatedStats.careers}+</p>
+              <p className="text-emerald-100">{t('landing.stats.careers', 'Career Paths')}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Features Section */}
       <div className="py-12 bg-white sm:py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="lg:text-center">
             <p className="text-base text-gray-500 font-semibold tracking-wide uppercase sm:text-lg lg:text-sm">
-              Why Choose Green Matchers?
+              {t('landing.why_choose', 'Why Choose Green Matchers?')}
             </p>
             <h2 className="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-gray-900 sm:text-4xl sm:leading-10 lg:text-5xl">
-              Everything you need to build a sustainable career
+              {t('landing.everything_need', 'Everything you need to build a sustainable career')}
             </h2>
             <p className="mx-auto mt-5 max-w-2xl text-xl text-gray-500">
-              Our AI-powered platform helps you find the perfect green job based on your skills, not just keywords.
+              {t('landing.ai_powered_desc', 'Our AI-powered platform helps you find the perfect green job based on your skills, not just keywords.')}
             </p>
           </div>
 

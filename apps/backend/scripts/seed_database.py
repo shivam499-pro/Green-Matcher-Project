@@ -9,13 +9,13 @@ import os
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from sqlalchemy.orm import Session
-from utils.db import engine, SessionLocal, init_db
-from models.user import User
-from models.job import Job
-from models.career import Career
-from models.application import Application
-from models.analytics import Analytics
-from core.security import get_password_hash
+from apps.backend.db import engine, SessionLocal, init_db
+from apps.backend.models.user import User
+from apps.backend.models.job import Job
+from apps.backend.models.career import Career
+from apps.backend.models.application import Application
+from apps.backend.models.analytics import Analytics
+from apps.backend.core.security import get_password_hash
 from datetime import datetime, timedelta
 import json
 

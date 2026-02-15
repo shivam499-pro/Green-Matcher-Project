@@ -1,24 +1,37 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { applicationsAPI, jobsAPI, recommendationsAPI, savedJobsAPI } from '../utils/api';
-import { t } from '../utils/translations';
+import { useI18n } from '../contexts/I18nContext';
 
 const JobSeekerDashboard = () => {
   
   const navigate = useNavigate();
+  const { t } = useI18n();
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('applications');
   const [applications, setApplications] = useState([]);
   const [savedJobs, setSavedJobs] = useState([]);
   const [recommendations, setRecommendations] = useState([]);
   const [error, setError] = useState(null);
+  const [stats, setStats] = useState({
+    totalApplications: 0,
+    pendingApplications: 0,
+    acceptedApplications: 0,
+  });
 
+  // Calculate stats when applications change
   useEffect(() => {
-    fetchData();
-  }, [activeTab]);
+    if (applications.length > 0) {
+      setStats({
+        totalApplications: applications.length,
+        pendingApplications: applications.filter(a => a.status === 'PENDING').length,
+        acceptedApplications: applications.filter(a => a.status === 'ACCEPTED').length,
+      });
+    }
+  }, [applications]);
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     setLoading(true);
     setError(null);
 
@@ -35,11 +48,15 @@ const JobSeekerDashboard = () => {
       }
     } catch (error) {
       console.error('Error fetching dashboard data:', error);
-      setError(t('Failed to load data'));
+      setError(t('errors.data_load_failed', 'Failed to load data'));
     } finally {
       setLoading(false);
     }
-  };
+  }, [activeTab, t]);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
 
   const handleUnsaveJob = async (jobId) => {
     try {
@@ -47,7 +64,7 @@ const JobSeekerDashboard = () => {
       setSavedJobs(prev => prev.filter(job => job.id !== jobId));
     } catch (error) {
       console.error('Error unsaving job:', error);
-      setError(t('Failed to remove job from saved'));
+      setError(t('errors.unsave_failed', 'Failed to remove job from saved'));
     }
   };
 
@@ -74,9 +91,9 @@ const JobSeekerDashboard = () => {
   };
 
   const tabs = [
-    { id: 'applications', label: t('My Applications'), count: applications.length },
-    { id: 'saved', label: t('Saved Jobs'), count: savedJobs.length },
-    { id: 'recommendations', label: t('Recommended Jobs'), count: recommendations.length },
+    { id: 'applications', label: t('dashboard.my_applications', 'My Applications'), count: applications.length },
+    { id: 'saved', label: t('dashboard.saved_jobs', 'Saved Jobs'), count: savedJobs.length },
+    { id: 'recommendations', label: t('dashboard.recommended_jobs', 'Recommended Jobs'), count: recommendations.length },
   ];
 
   return (
@@ -232,7 +249,7 @@ const JobSeekerDashboard = () => {
                             <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
-                            ₹{app.job.salary_min.toLocaleString()} - ₹{app.job.salary_max.toLocaleString()}/year
+                            ₹{Number(app.job.salary_min).toLocaleString()} - ₹{Number(app.job.salary_max).toLocaleString()}/year
                           </span>
                         )}
                       </div>
@@ -310,7 +327,7 @@ const JobSeekerDashboard = () => {
                             <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
-                            ₹{job.salary_min.toLocaleString()} - ₹{job.salary_max.toLocaleString()}/year
+                            ₹{Number(job.salary_min).toLocaleString()} - ₹{Number(job.salary_max).toLocaleString()}/year
                           </span>
                         )}
                       </div>
@@ -399,7 +416,7 @@ const JobSeekerDashboard = () => {
                             <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
-                            ₹{rec.job.salary_min.toLocaleString()} - ₹{rec.job.salary_max.toLocaleString()}/year
+                            ₹{Number(rec.job.salary_min).toLocaleString()} - ₹{Number(rec.job.salary_max).toLocaleString()}/year
                           </span>
                         )}
                       </div>

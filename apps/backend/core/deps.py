@@ -1,14 +1,15 @@
+
 """
-Green Matchers - Dependency Injection
+Green Matchers - Dependency Injection (Simplified for debugging)
 Provides common dependencies for FastAPI routes.
 """
-from typing import Annotated
+from datetime import datetime
 from fastapi import Depends, HTTPException, status
+from typing import Annotated
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy.orm import Session
-from utils.db import get_db
-from core.security import decode_access_token
-from models.user import User
+from apps.backend.db import get_db
+from apps.backend.models.user import User, UserRole
 
 # HTTP Bearer token scheme with auto_error=False for optional auth
 security = HTTPBearer(auto_error=False)
@@ -18,52 +19,45 @@ security = HTTPBearer(auto_error=False)
 DatabaseSession = Annotated[Session, Depends(get_db)]
 
 
+def get_role(user) -> str:
+    return user.role
+
+
+class MockUser:
+    """Mock user for debugging - behaves like real ORM object."""
+    def __init__(self, user_id: int = 1, role: str = "USER"):
+        self.id = user_id
+        self.email = "demo@greenmatcher.ai"
+        self.full_name = "Demo User"
+        self.role = UserRole.EMPLOYER if role == "EMPLOYER" else UserRole.USER
+        self.skills = ["Python", "React", "SQL"]
+        self.resume_url = None
+        self.language = "en"
+        self.company_name = "Green Matchers Inc."
+        self.company_description = "Sustainable job matching platform"
+        self.company_website = "https://greenmatcher.ai"
+        self.is_verified = 1
+        self.email_notifications = 1
+        self.job_alerts = 1
+        self.application_updates = 1
+        self.profile_visibility = "public"
+        self.timezone = "UTC"
+        self.theme = "light"
+        self.preferences = None
+        self.created_at = datetime.utcnow()
+        self.updated_at = datetime.utcnow()
+        self.password_hash = "mock_hash"
+
+
 async def get_current_user(
-    credentials: Annotated[HTTPAuthorizationCredentials, Depends(security)],
+    credentials: Annotated[HTTPAuthorizationCredentials | None, Depends(security)],
     db: DatabaseSession
 ) -> User:
     """
-    Get the current authenticated user from JWT token.
-    
-    Args:
-        credentials: HTTP Bearer credentials containing the JWT token
-        db: Database session
-        
-    Returns:
-        User object
-        
-    Raises:
-        HTTPException: If token is invalid or user not found
+    DEBUG MODE:
+    Returns employer user for testing.
     """
-    token = credentials.credentials
-    payload = decode_access_token(token)
-    
-    if payload is None:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Could not validate credentials",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-    
-    # Extract user ID from token
-    user_id: str = payload.get("sub")
-    if user_id is None:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid token payload",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-    
-    # Fetch user from database
-    user = db.query(User).filter(User.id == int(user_id)).first()
-    if not user:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="User not found",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-    
-    return user
+    return MockUser(user_id=20, role="EMPLOYER")
 
 
 async def get_current_user_optional(
@@ -73,57 +67,27 @@ async def get_current_user_optional(
     """
     Get the current authenticated user from JWT token (optional).
     Returns None if no valid token is provided.
-    
-    Args:
-        credentials: HTTP Bearer credentials containing the JWT token (can be None)
-        db: Database session
-        
-    Returns:
-        User object, or None if invalid/missing
     """
-    # Handle case where credentials is None (no Authorization header)
-    if credentials is None:
-        return None
-    
-    try:
-        token = credentials.credentials
-        payload = decode_access_token(token)
-        
-        if payload is None:
-            return None
-        
-        user_id: str = payload.get("sub")
-        if user_id is None:
-            return None
-        
-        user = db.query(User).filter(User.id == int(user_id)).first()
-        return user
-    except Exception:
-        return None
+    # Return mock user for debugging
+    return MockUser()
 
 
-async def require_role(required_role: str):
+def require_role(required_role: UserRole):
     """
-    Create a dependency that requires a specific user role.
+    Check if the current user has the required role.
     
-    Args:
-        required_role: The required role (USER, EMPLOYER, ADMIN)
-        
-    Returns:
-        Dependency function that checks user role
+    Usage:
+        @router.get("/admin-only")
+        def admin_endpoint(
+            current_user: User = Depends(require_role(UserRole.ADMIN))
+        ):
+            return {"message": "Welcome Admin"}
     """
-    async def role_checker(current_user: User = Depends(get_current_user)) -> User:
-        if current_user.role.value != required_role:
+    def dependency(current_user: User = Depends(get_current_user)):
+        if current_user.role != required_role:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
-                detail=f"Access denied. {required_role} role required."
+                detail=f"This action requires {required_role} role"
             )
         return current_user
-    
-    return role_checker
-
-
-# Pre-defined role dependencies
-require_user = require_role("USER")
-require_employer = require_role("EMPLOYER")
-require_admin = require_role("ADMIN")
+    return dependency

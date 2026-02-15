@@ -1,10 +1,13 @@
 """
 Resume Service
 Handles resume skill extraction using NLP and rule-based approaches
+Supports TXT, JSON, and PDF formats
 """
 
 import logging
 import re
+import json
+import io
 from typing import List, Dict, Optional, Set
 from dataclasses import dataclass
 
@@ -57,6 +60,20 @@ GREEN_KEYWORDS = {
     "sustainability", "biodiversity", "pollution", "waste", "water",
 }
 
+# Additional skill patterns for extraction
+SKILL_PATTERNS = {
+    # Programming with versions
+    r'\b(python|java|javascript|typescript)\s*\d*(?:\.\d+)?\b',
+    # Frameworks
+    r'\b(react|angular|vue|django|flask|spring)\s*(?:js|native)?\b',
+    # Cloud platforms
+    r'\b(aws|azure|gcp|google cloud)\b',
+    # Certifications
+    r'\b(aws certified|azure certified|pmp|scrum master)\b',
+    # Green certifications
+    r'\b(leed|breeam|iso 14001|ghg protocol)\b',
+}
+
 
 @dataclass
 class ExtractedSkills:
@@ -66,6 +83,8 @@ class ExtractedSkills:
     green_skills: List[str]
     all_skills: List[str]
     confidence_score: float
+    sections: Dict[str, str]
+    raw_text_length: int
 
 
 class ResumeService:
@@ -74,12 +93,17 @@ class ResumeService:
     
     Combines keyword matching, pattern recognition, and semantic analysis
     to extract relevant skills from resume text.
+    
+    Supports:
+    - Plain text (TXT)
+    - JSON format
+    - PDF (requires PyPDF2)
     """
     
     def __init__(self, embedding_service: EmbeddingService):
         self.embedding_service = embedding_service
     
-    def extract_skills(
+    def extract_skills_from_text(
         self,
         resume_text: str,
         use_semantic: bool = True
@@ -96,18 +120,24 @@ class ResumeService:
         """
         if not resume_text or not resume_text.strip():
             logger.warning("Empty resume text provided")
-            return ExtractedSkills([], [], [], [], 0.0)
+            return ExtractedSkills([], [], [], [], 0.0, {}, 0)
         
         # Normalize text
         normalized_text = self._normalize_text(resume_text)
+        
+        # Parse sections
+        sections = self.parse_resume_sections(resume_text)
         
         # Extract skills using keyword matching
         technical_skills = self._extract_technical_skills(normalized_text)
         soft_skills = self._extract_soft_skills(normalized_text)
         green_skills = self._extract_green_skills(normalized_text)
         
+        # Extract skills using patterns
+        pattern_skills = self._extract_pattern_skills(normalized_text)
+        
         # Combine all skills (remove duplicates)
-        all_skills = list(set(technical_skills + soft_skills + green_skills))
+        all_skills = list(set(technical_skills + soft_skills + green_skills + pattern_skills))
         
         # Calculate confidence score based on number of skills found
         confidence_score = self._calculate_confidence(all_skills, normalized_text)
@@ -123,8 +153,107 @@ class ResumeService:
             soft_skills=soft_skills,
             green_skills=green_skills,
             all_skills=all_skills,
-            confidence_score=confidence_score
+            confidence_score=confidence_score,
+            sections=sections,
+            raw_text_length=len(resume_text)
         )
+    
+    def extract_skills_from_json(self, resume_json: Dict) -> ExtractedSkills:
+        """
+        Extract skills from JSON-formatted resume.
+        
+        Args:
+            resume_json: Dictionary containing resume data
+            
+        Returns:
+            ExtractedSkills: Object containing extracted skills
+        """
+        # Combine all text fields from JSON
+        text_parts = []
+        
+        # Common JSON resume fields
+        text_fields = [
+            'summary', 'objective', 'profile',
+            'skills', 'technical_skills', 'competencies',
+            'experience', 'work_experience', 'employment',
+            'education', 'certifications', 'projects'
+        ]
+        
+        for field in text_fields:
+            if field in resume_json:
+                value = resume_json[field]
+                if isinstance(value, str):
+                    text_parts.append(value)
+                elif isinstance(value, list):
+                    text_parts.extend(str(item) for item in value)
+                elif isinstance(value, dict):
+                    text_parts.extend(str(v) for v in value.values())
+        
+        combined_text = ' '.join(text_parts)
+        return self.extract_skills_from_text(combined_text)
+    
+    def extract_skills_from_pdf(self, pdf_content: bytes) -> ExtractedSkills:
+        """
+        Extract skills from PDF content.
+        
+        Args:
+            pdf_content: Raw PDF file bytes
+            
+        Returns:
+            ExtractedSkills: Object containing extracted skills
+        """
+        try:
+            import PyPDF2
+            
+            pdf_reader = PyPDF2.PdfReader(io.BytesIO(pdf_content))
+            text_parts = []
+            
+            for page in pdf_reader.pages:
+                text = page.extract_text()
+                if text:
+                    text_parts.append(text)
+            
+            combined_text = ' '.join(text_parts)
+            return self.extract_skills_from_text(combined_text)
+            
+        except ImportError:
+            logger.error("PyPDF2 not installed. Install with: pip install PyPDF2")
+            return ExtractedSkills([], [], [], [], 0.0, {}, 0)
+        except Exception as e:
+            logger.error(f"Error extracting text from PDF: {str(e)}")
+            return ExtractedSkills([], [], [], [], 0.0, {}, 0)
+    
+    def parse_resume_file(self, file_content: bytes, file_type: str) -> ExtractedSkills:
+        """
+        Parse resume file and extract skills.
+        
+        Args:
+            file_content: Raw file bytes
+            file_type: File type ('txt', 'json', 'pdf')
+            
+        Returns:
+            ExtractedSkills: Object containing extracted skills
+        """
+        file_type = file_type.lower()
+        
+        if file_type == 'txt':
+            text = file_content.decode('utf-8', errors='ignore')
+            return self.extract_skills_from_text(text)
+        
+        elif file_type == 'json':
+            try:
+                data = json.loads(file_content.decode('utf-8'))
+                return self.extract_skills_from_json(data)
+            except json.JSONDecodeError as e:
+                logger.error(f"Invalid JSON: {str(e)}")
+                return ExtractedSkills([], [], [], [], 0.0, {}, 0)
+        
+        elif file_type == 'pdf':
+            return self.extract_skills_from_pdf(file_content)
+        
+        else:
+            logger.warning(f"Unsupported file type: {file_type}")
+            return ExtractedSkills([], [], [], [], 0.0, {}, 0)
     
     def _normalize_text(self, text: str) -> str:
         """
@@ -181,27 +310,25 @@ class ResumeService:
         
         # Look for soft skill keywords
         soft_skill_patterns = [
-            r'\bleadership\b',
-            r'\bcommunication\b',
-            r'\bteamwork\b',
-            r'\bteam work\b',
-            r'\bproblem solving\b',
-            r'\banalytical\b',
-            r'\bproject management\b',
-            r'\bagile\b',
-            r'\bscrum\b',
-            r'\btime management\b',
-            r'\badaptability\b',
-            r'\bcreativity\b',
-            r'\bcritical thinking\b',
-            r'\bcollaboration\b',
+            (r'\bleadership\b', 'leadership'),
+            (r'\bcommunication\b', 'communication'),
+            (r'\bteamwork\b', 'teamwork'),
+            (r'\bteam work\b', 'teamwork'),
+            (r'\bproblem solving\b', 'problem solving'),
+            (r'\banalytical\b', 'analytical'),
+            (r'\bproject management\b', 'project management'),
+            (r'\bagile\b', 'agile'),
+            (r'\bscrum\b', 'scrum'),
+            (r'\btime management\b', 'time management'),
+            (r'\badaptability\b', 'adaptability'),
+            (r'\bcreativity\b', 'creativity'),
+            (r'\bcritical thinking\b', 'critical thinking'),
+            (r'\bcollaboration\b', 'collaboration'),
         ]
         
-        for pattern in soft_skill_patterns:
+        for pattern, skill_name in soft_skill_patterns:
             if re.search(pattern, text):
-                # Extract the skill name from the pattern
-                skill = pattern.replace(r'\b', '').replace(r'\b', '')
-                found_skills.append(skill)
+                found_skills.append(skill_name)
         
         return found_skills
     
@@ -224,6 +351,29 @@ class ResumeService:
         
         return found_skills
     
+    def _extract_pattern_skills(self, text: str) -> List[str]:
+        """
+        Extract skills using regex patterns.
+        
+        Args:
+            text: Normalized resume text
+            
+        Returns:
+            List[str]: List of skills found via patterns
+        """
+        found_skills = []
+        
+        for pattern in SKILL_PATTERNS:
+            matches = re.findall(pattern, text, re.IGNORECASE)
+            for match in matches:
+                if isinstance(match, tuple):
+                    match = match[0] if match[0] else match[1] if len(match) > 1 else ''
+                skill = match.lower().strip()
+                if skill and skill not in found_skills:
+                    found_skills.append(skill)
+        
+        return found_skills
+    
     def _find_semantic_skills(self, known_skills: List[str]) -> List[str]:
         """
         Find additional skills using semantic similarity.
@@ -234,14 +384,26 @@ class ResumeService:
         Returns:
             List[str]: Additional semantically similar skills
         """
-        # This is a simplified version - in production, you would:
-        # 1. Create embeddings for known skills
-        # 2. Compare with a comprehensive skill database
-        # 3. Return skills above a similarity threshold
+        # Semantic skill expansion using related skills
+        skill_relations = {
+            "python": ["django", "flask", "fastapi", "data science"],
+            "javascript": ["node.js", "react", "vue", "angular"],
+            "react": ["javascript", "typescript", "next.js"],
+            "machine learning": ["deep learning", "tensorflow", "pytorch", "nlp"],
+            "aws": ["cloud", "docker", "kubernetes", "devops"],
+            "solar": ["renewable energy", "photovoltaic", "clean energy"],
+            "wind": ["renewable energy", "turbine", "clean energy"],
+            "sustainability": ["esg", "environmental", "green", "climate"],
+        }
         
-        # For now, return empty list
-        # This can be enhanced with a skill database and semantic search
-        return []
+        additional_skills = []
+        for skill in known_skills:
+            if skill in skill_relations:
+                for related in skill_relations[skill]:
+                    if related not in known_skills and related not in additional_skills:
+                        additional_skills.append(related)
+        
+        return additional_skills
     
     def _calculate_confidence(self, skills: List[str], text: str) -> float:
         """
@@ -266,8 +428,11 @@ class ResumeService:
         # Bonus for technical skills
         tech_skill_bonus = 0.1 if len([s for s in skills if s in TECHNICAL_SKILLS]) >= 3 else 0.0
         
+        # Bonus for text length (longer resumes have more context)
+        length_bonus = min(len(text) / 5000, 0.1)  # Max 0.1 bonus
+        
         # Calculate final score
-        confidence = skill_count_score + green_skill_bonus + tech_skill_bonus
+        confidence = skill_count_score + green_skill_bonus + tech_skill_bonus + length_bonus
         
         return min(confidence, 1.0)
     
@@ -357,6 +522,27 @@ class ResumeService:
             List[float]: 768-dimensional embedding vector
         """
         return self.embedding_service.encode_user_skills(skills)
+    
+    def get_extraction_summary(self, extracted: ExtractedSkills) -> Dict:
+        """
+        Get a summary of the extraction results.
+        
+        Args:
+            extracted: ExtractedSkills object
+            
+        Returns:
+            Dict: Summary of extraction
+        """
+        return {
+            "total_skills": len(extracted.all_skills),
+            "technical_skills_count": len(extracted.technical_skills),
+            "soft_skills_count": len(extracted.soft_skills),
+            "green_skills_count": len(extracted.green_skills),
+            "confidence_score": round(extracted.confidence_score * 100, 2),
+            "has_green_skills": len(extracted.green_skills) > 0,
+            "top_skills": extracted.all_skills[:10],
+            "sections_found": [k for k, v in extracted.sections.items() if v],
+        }
 
 
 # Singleton instance for dependency injection

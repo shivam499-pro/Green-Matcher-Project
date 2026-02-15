@@ -3,10 +3,11 @@
  * Displays skill popularity analytics.
  */
 import React from 'react';
+import { useI18n } from '../../contexts/I18nContext';
 
 
 const SkillPopularityChart = ({ skillPopularity }) => {
-  
+  const { t } = useI18n();
 
   if (!skillPopularity || skillPopularity.length === 0) {
     return (

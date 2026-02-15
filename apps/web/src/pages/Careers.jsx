@@ -1,12 +1,13 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { careersAPI } from '../utils/api';
-import { t } from '../utils/translations';
+import { useI18n } from '../contexts/I18nContext';
 
 const Careers = () => {
   
   const navigate = useNavigate();
+  const { t } = useI18n();
   
   // State management
   const [loading, setLoading] = useState(true);
@@ -14,26 +15,31 @@ const Careers = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedSDG, setSelectedSDG] = useState('');
   const [error, setError] = useState(null);
-
-  useEffect(() => {
-    fetchCareers();
-  }, []);
+  const [totalCareers, setTotalCareers] = useState(0);
+  const [sortBy, setSortBy] = useState('demand_score');
 
   // Fetch careers from API
-  const fetchCareers = async () => {
+  const fetchCareers = useCallback(async () => {
     setLoading(true);
     setError(null);
 
     try {
-      const response = await careersAPI.listCareers();
-      setCareers(response?.data?.items || response?.data || []);
+      const params = { sort_by: sortBy };
+      const response = await careersAPI.listCareers(params);
+      const careersData = response?.data?.items || response?.data || [];
+      setCareers(careersData);
+      setTotalCareers(careersData.length);
     } catch (err) {
       console.error('Error fetching careers:', err);
-      setError(t('careers.fetchError') || 'Failed to load careers. Please try again.');
+      setError(t('careers.fetch_error', 'Failed to load careers. Please try again.'));
     } finally {
       setLoading(false);
     }
-  };
+  }, [sortBy, t]);
+
+  useEffect(() => {
+    fetchCareers();
+  }, [fetchCareers]);
 
   // Handle search submission
   const handleSearch = async (e) => {
@@ -48,15 +54,17 @@ const Careers = () => {
     setError(null);
 
     try {
-      const params = {};
+      const params = { sort_by: sortBy };
       if (searchQuery.trim()) params.search = searchQuery;
       if (selectedSDG) params.sdg_tag = selectedSDG;
       
       const response = await careersAPI.listCareers(params);
-      setCareers(response?.data?.items || response?.data || []);
+      const careersData = response?.data?.items || response?.data || [];
+      setCareers(careersData);
+      setTotalCareers(careersData.length);
     } catch (err) {
       console.error('Error searching careers:', err);
-      setError(t('careers.searchError') || 'Failed to search careers. Please try again.');
+      setError(t('careers.search_error', 'Failed to search careers. Please try again.'));
     } finally {
       setLoading(false);
     }

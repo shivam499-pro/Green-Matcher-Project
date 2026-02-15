@@ -9,8 +9,8 @@ from dataclasses import dataclass
 
 from sqlalchemy.orm import Session
 
-from models.career import Career
-from models.user import User
+from apps.backend.models.career import Career
+from apps.backend.models.user import User
 from .embeddings import EmbeddingService
 
 logger = logging.getLogger(__name__)
@@ -290,7 +290,7 @@ class MatchingService:
             logger.warning(f"User {user.id} has no skills to match")
             return []
         
-        from models.job import Job
+        from apps.backend.models.job import Job
         
         # Get user skill embedding
         user_embedding = self.embedding_service.encode_user_skills(user.skills)

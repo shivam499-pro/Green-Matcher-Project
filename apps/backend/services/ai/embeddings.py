@@ -16,7 +16,7 @@ from functools import lru_cache
 import numpy as np
 from sentence_transformers import SentenceTransformer
 
-from core.config import settings
+from apps.backend.core.config import settings
 
 logger = logging.getLogger(__name__)
 

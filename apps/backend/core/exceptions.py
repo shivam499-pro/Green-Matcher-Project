@@ -12,6 +12,27 @@ from fastapi.exceptions import HTTPException
 logger = logging.getLogger(__name__)
 
 
+class NotFoundException(Exception):
+    """Resource not found exception."""
+    def __init__(self, detail: str = "Resource not found"):
+        self.detail = detail
+        super().__init__(detail)
+
+
+class ForbiddenException(Exception):
+    """Access forbidden exception."""
+    def __init__(self, detail: str = "Access denied"):
+        self.detail = detail
+        super().__init__(detail)
+
+
+class BadRequestException(Exception):
+    """Bad request exception."""
+    def __init__(self, detail: str = "Bad request"):
+        self.detail = detail
+        super().__init__(detail)
+
+
 def register_exception_handlers(app: FastAPI):
     """Register global exception handlers for the FastAPI app."""
     
@@ -78,4 +99,28 @@ def register_exception_handlers(app: FastAPI):
             content={
                 "detail": "An unexpected error occurred. Please try again later."
             }
+        )
+    
+    @app.exception_handler(NotFoundException)
+    async def not_found_exception_handler(request: Request, exc: NotFoundException):
+        """Handle NotFoundException."""
+        return JSONResponse(
+            status_code=status.HTTP_404_NOT_FOUND,
+            content={"detail": exc.detail}
+        )
+    
+    @app.exception_handler(ForbiddenException)
+    async def forbidden_exception_handler(request: Request, exc: ForbiddenException):
+        """Handle ForbiddenException."""
+        return JSONResponse(
+            status_code=status.HTTP_403_FORBIDDEN,
+            content={"detail": exc.detail}
+        )
+    
+    @app.exception_handler(BadRequestException)
+    async def bad_request_exception_handler(request: Request, exc: BadRequestException):
+        """Handle BadRequestException."""
+        return JSONResponse(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            content={"detail": exc.detail}
         )

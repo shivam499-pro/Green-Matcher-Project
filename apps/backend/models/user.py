@@ -4,7 +4,7 @@ Green Matchers - User Model
 from sqlalchemy import Column, Integer, String, DateTime, Enum as SQLEnum, JSON
 from sqlalchemy.orm import relationship
 from datetime import datetime, timezone
-from utils.db import Base
+from apps.backend.db.base import Base
 import enum
 
 
@@ -53,11 +53,27 @@ class User(Base):
 
     # Relationships
     posted_jobs = relationship("Job", back_populates="employer", cascade="all, delete-orphan")
-    applications = relationship("Application", back_populates="applicant", cascade="all, delete-orphan")
+    
+    # Job seeker → applications they submitted
+    applications = relationship(
+        "Application",
+        foreign_keys="Application.user_id",
+        back_populates="applicant",
+        cascade="all, delete-orphan"
+    )
+    
+    # Employer/Admin → decisions they made on applications
+    decisions_made = relationship(
+        "Application",
+        foreign_keys="Application.decided_by"
+    )
+    
     saved_jobs = relationship("SavedJob", back_populates="user", cascade="all, delete-orphan")
     job_alerts = relationship("JobAlert", back_populates="user", cascade="all, delete-orphan")
     notifications = relationship("Notification", back_populates="user", cascade="all, delete-orphan")
     browse_history = relationship("BrowseHistory", back_populates="user", cascade="all, delete-orphan")
+    resumes = relationship("Resume", back_populates="user", cascade="all, delete-orphan")
+    user_skills_rel = relationship("UserSkill", back_populates="user", cascade="all, delete-orphan")
 
     def __repr__(self):
         return f"<User(id={self.id}, email={self.email}, role={self.role})>"

@@ -1,10 +1,18 @@
 """
 Green Matchers - Job Model
 """
-from sqlalchemy import Column, Integer, String, Text, DateTime, ForeignKey, JSON, Boolean
+from sqlalchemy import Column, Integer, String, Text, DateTime, ForeignKey, Boolean, JSON, Enum as SQLEnum
 from sqlalchemy.orm import relationship
 from datetime import datetime, timezone
-from utils.db import Base
+from apps.backend.db.base import Base
+import enum
+
+
+class JobStatus(str, enum.Enum):
+    DRAFT = "DRAFT"
+    OPEN = "OPEN"
+    CLOSED = "CLOSED"
+    ARCHIVED = "ARCHIVED"
 
 
 class Job(Base):
@@ -41,10 +49,13 @@ class Job(Base):
     is_remote = Column(Boolean, default=False)
     
     # SDG (Sustainable Development Goals) tags
-    sdg_tags = Column(JSON, nullable=True)  # Array of SDG goal numbers
+    sdg_tags = Column(JSON, nullable=False, default=[])  # Array of SDG goal numbers
     
     # Active status
     is_active = Column(Boolean, default=True)
+    
+    # Job status
+    status = Column(SQLEnum(JobStatus), nullable=False, default=JobStatus.DRAFT)
     
     # Verification status
     is_verified = Column(Boolean, default=False)

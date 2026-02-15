@@ -3,10 +3,11 @@ Green Matchers - Users Routes
 """
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-from core.deps import DatabaseSession, get_current_user
-from models.user import User
-from models.saved_job import SavedJob
-from schemas.user import UserResponse, UserUpdate, EmployerProfileUpdate, SkillsUpdate, UserPublicProfile
+from datetime import datetime, timezone
+from apps.backend.core.deps import DatabaseSession, get_current_user
+from apps.backend.models.user import User
+from apps.backend.models.saved_job import SavedJob
+from apps.backend.schemas.user import UserResponse, UserUpdate, EmployerProfileUpdate, SkillsUpdate, UserPublicProfile
 
 router = APIRouter()
 
@@ -19,6 +20,9 @@ def get_current_user_info(
     """
     Get current user information.
     """
+    # Update last activity timestamp
+    current_user.last_activity = datetime.now(timezone.utc)
+    db.commit()
     return current_user
 
 
@@ -40,6 +44,9 @@ def update_current_user(
         current_user.skills = user_update.skills
     if user_update.resume_url is not None:
         current_user.resume_url = user_update.resume_url
+    
+    # Update modification timestamp
+    current_user.updated_at = datetime.now(timezone.utc)
     
     db.commit()
     db.refresh(current_user)
@@ -169,7 +176,7 @@ def get_saved_jobs(
     """
     Get user's saved jobs using proper join table.
     """
-    from models.job import Job
+    from apps.backend.models.job import Job
     
     # Query saved jobs through join table
     saved_entries = db.query(SavedJob).filter(SavedJob.user_id == current_user.id).all()
@@ -188,8 +195,8 @@ def get_career_recommendations(
     """
     Get career recommendations for the current user based on their skills.
     """
-    from services.ai.matching import matching_service
-    from models.career import Career
+    from apps.backend.services.ai.matching import matching_service
+    from apps.backend.models.career import Career
     
     # Get career recommendations
     recommendations = matching_service.get_career_recommendations(db, current_user, limit=limit)
@@ -227,8 +234,8 @@ def get_job_recommendations(
     """
     Get job recommendations for the current user based on their skills.
     """
-    from services.ai.matching import matching_service
-    from models.job import Job
+    from apps.backend.services.ai.matching import matching_service
+    from apps.backend.models.job import Job
     
     # Get job recommendations
     recommendations = matching_service.get_job_recommendations(db, current_user, limit=limit)

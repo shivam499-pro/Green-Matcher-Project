@@ -1,54 +1,47 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useI18n } from '../../contexts/I18nContext';
+import { useAuth } from '../../contexts/AuthContext';
+import LanguageToggle from './LanguageToggle';
 
 /**
  * Navigation Component
  * Provides navigation based on user authentication status and role
+ * Uses AuthContext for consistent authentication state
  */
 const Navigation = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const { t } = useI18n();
+  const { user, logout, isAuthenticated } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [user, setUser] = useState(null);
-
-  // Load user from localStorage on mount
-  useEffect(() => {
-    const storedUser = localStorage.getItem('user');
-    if (storedUser) {
-      try {
-        setUser(JSON.parse(storedUser));
-      } catch (e) {
-        console.error('Error parsing user:', e);
-      }
-    }
-  }, []);
 
   // Navigation items based on user role
   const publicNavItems = [
-    { path: '/', label: 'Home' },
-    { path: '/jobs', label: 'Browse Jobs' },
-    { path: '/careers', label: 'Explore Careers' },
+    { path: '/', label: t('nav.home') },
+    { path: '/jobs', label: t('jobs.title') },
+    { path: '/careers', label: t('careers.title') },
   ];
 
   const jobSeekerNavItems = [
-    { path: '/dashboard', label: 'Dashboard' },
-    { path: '/jobs', label: 'Browse Jobs' },
-    { path: '/careers', label: 'Explore Careers' },
-    { path: '/recommendations', label: 'Recommendations' },
-    { path: '/profile', label: 'Profile' },
+    { path: '/dashboard', label: t('nav.dashboard') },
+    { path: '/jobs', label: t('jobs.title') },
+    { path: '/careers', label: t('careers.title') },
+    { path: '/recommendations', label: t('recommendations.title') },
+    { path: '/profile', label: t('nav.profile') },
   ];
 
   const employerNavItems = [
-    { path: '/employer-dashboard', label: 'Dashboard' },
-    { path: '/jobs', label: 'My Jobs' },
-    { path: '/employer-profile', label: 'Company Profile' },
+    { path: '/employer-dashboard', label: t('nav.dashboard') },
+    { path: '/jobs', label: t('employer.yourJobs') },
+    { path: '/employer-profile', label: t('profile.title') },
   ];
 
   const adminNavItems = [
-    { path: '/admin-dashboard', label: 'Dashboard' },
-    { path: '/analytics', label: 'Analytics' },
-    { path: '/jobs', label: 'Jobs' },
-    { path: '/careers', label: 'Careers' },
+    { path: '/admin-dashboard', label: t('nav.dashboard') },
+    { path: '/analytics', label: t('analytics.title') },
+    { path: '/jobs', label: t('jobs.title') },
+    { path: '/careers', label: t('careers.title') },
   ];
 
   // Get navigation items based on user role
@@ -64,9 +57,7 @@ const Navigation = () => {
 
   // Handle logout
   const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    setUser(null);
+    logout();
     setIsMenuOpen(false);
     navigate('/');
   };
@@ -107,19 +98,22 @@ const Navigation = () => {
             ))}
           </div>
 
-          {/* Right side - Auth */}
+          {/* Right side - Auth & Language */}
           <div className="hidden sm:ml-6 sm:flex sm:items-center sm:space-x-4">
+            {/* Language Toggle */}
+            <LanguageToggle />
+            
             {/* Auth Buttons */}
-            {user ? (
+            {isAuthenticated ? (
               <div className="flex items-center space-x-4">
                 <span className="text-sm text-gray-700">
-                  Signed in as {user.full_name}
+                  {t('dashboard.welcomeBack')}, {user.full_name}
                 </span>
                 <button
                   onClick={handleLogout}
                   className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-emerald-600 hover:text-emerald-700 hover:bg-gray-50"
                 >
-                  Sign Out
+                  {t('nav.logout')}
                 </button>
               </div>
             ) : (
@@ -128,13 +122,13 @@ const Navigation = () => {
                   to="/login"
                   className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-emerald-600 hover:text-emerald-700 hover:bg-gray-50"
                 >
-                  Sign In
+                  {t('auth.signIn')}
                 </Link>
                 <Link
                   to="/register"
                   className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md bg-emerald-600 text-white hover:bg-emerald-700"
                 >
-                  Sign Up
+                  {t('auth.signUp')}
                 </Link>
               </div>
             )}
@@ -181,16 +175,20 @@ const Navigation = () => {
             ))}
           </div>
           <div className="pt-4 pb-4 border-t border-gray-200">
-            {user ? (
+            {/* Language Toggle for Mobile */}
+            <div className="px-4 py-2">
+              <LanguageToggle />
+            </div>
+            {isAuthenticated ? (
               <div className="space-y-1">
                 <div className="px-4 py-2 text-sm text-gray-700">
-                  Signed in as {user.full_name}
+                  {t('dashboard.welcomeBack')}, {user.full_name}
                 </div>
                 <button
                   onClick={handleLogout}
                   className="w-full text-left px-4 py-2 text-base font-medium text-emerald-600 hover:text-emerald-700 hover:bg-gray-50"
                 >
-                  Sign Out
+                  {t('nav.logout')}
                 </button>
               </div>
             ) : (
@@ -200,14 +198,14 @@ const Navigation = () => {
                   onClick={() => setIsMenuOpen(false)}
                   className="block px-4 py-2 text-base font-medium text-emerald-600 hover:text-emerald-700 hover:bg-gray-50"
                 >
-                  Sign In
+                  {t('auth.signIn')}
                 </Link>
                 <Link
                   to="/register"
                   onClick={() => setIsMenuOpen(false)}
                   className="block px-4 py-2 text-base font-medium text-emerald-600 hover:text-emerald-700 hover:bg-gray-50"
                 >
-                  Sign Up
+                  {t('auth.signUp')}
                 </Link>
               </div>
             )}

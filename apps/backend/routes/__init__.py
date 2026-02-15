@@ -10,6 +10,7 @@ from .analytics import router as analytics_router
 from .ai import router as ai_router
 from .search import router as search_router
 from .preferences import router as preferences_router
+from .admin import router as admin_router
 
 __all__ = [
     "auth_router",
@@ -21,4 +22,5 @@ __all__ = [
     "ai_router",
     "search_router",
     "preferences_router",
+    "admin_router",
 ]

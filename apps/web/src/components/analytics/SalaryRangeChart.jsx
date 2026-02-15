@@ -3,10 +3,11 @@
  * Displays salary range analytics by career.
  */
 import React from 'react';
+import { useI18n } from '../../contexts/I18nContext';
 
 
 const SalaryRangeChart = ({ salaryRanges }) => {
-  
+  const { t } = useI18n();
 
   if (!salaryRanges || salaryRanges.length === 0) {
     return (

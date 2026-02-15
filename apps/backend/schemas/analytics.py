@@ -63,8 +63,7 @@ class AnalyticsResponse(BaseModel):
     data: Any
     computed_at: datetime
 
-    class Config:
-        from_attributes = True
+    model_config = {"from_attributes": True}
 
 
 # Career Demand Query Parameters

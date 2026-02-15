@@ -35,6 +35,9 @@ sympy==1.13.1
 # NLP (commented out - requires GCC >= 8.4)
 # spacy==3.7.2
 
+# PDF Processing (for resume parsing)
+PyPDF2==3.0.1
+
 # Utilities
 python-dotenv==1.0.0
 

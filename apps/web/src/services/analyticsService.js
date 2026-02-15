@@ -3,6 +3,7 @@
  * Handles all analytics-related API calls
  */
 import axios from 'axios';
+import { STORAGE_KEYS } from '@/config/constants';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
@@ -16,13 +17,36 @@ const api = axios.create({
 
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem(STORAGE_KEYS.TOKEN);
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
+    }
+    // Add language parameter from localStorage
+    const language = localStorage.getItem(STORAGE_KEYS.LANGUAGE) || 'en';
+    if (config.params) {
+      config.params = { ...config.params, language };
+    } else {
+      config.params = { language };
     }
     return config;
   },
   (error) => Promise.reject(error)
+);
+
+// Handle 401 errors (redirect to login)
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      const currentPath = window.location.pathname;
+      if (currentPath !== '/login' && currentPath !== '/register') {
+        localStorage.removeItem(STORAGE_KEYS.TOKEN);
+        localStorage.removeItem(STORAGE_KEYS.USER);
+        window.location.href = '/login';
+      }
+    }
+    return Promise.reject(error);
+  }
 );
 
 /**
@@ -30,7 +54,7 @@ api.interceptors.request.use(
  * @returns {Promise<Object>} Analytics overview data
  */
 export const getAnalyticsOverview = async () => {
-  const response = await api.get(`${API_URL}/analytics/overview`);
+  const response = await api.get(`/api/analytics/overview`);
   return response.data;
 };
 
@@ -40,7 +64,7 @@ export const getAnalyticsOverview = async () => {
  * @returns {Promise<Object[]>} Career demand data
  */
 export const getCareerDemand = async (limit = 10) => {
-  const response = await api.get(`${API_URL}/analytics/career-demand`, { params: { limit } });
+  const response = await api.get(`/api/analytics/career-demand`, { params: { limit } });
   return response.data;
 };
 
@@ -50,7 +74,7 @@ export const getCareerDemand = async (limit = 10) => {
  * @returns {Promise<Object[]>} Skill popularity data
  */
 export const getSkillPopularity = async (limit = 20) => {
-  const response = await api.get(`${API_URL}/analytics/skill-popularity`, { params: { limit } });
+  const response = await api.get(`/api/analytics/skill-popularity`, { params: { limit } });
   return response.data;
 };
 
@@ -64,7 +88,7 @@ export const getSalaryRanges = async (careerId = null, limit = 20) => {
   const params = { limit };
   if (careerId) params.career_id = careerId;
   
-  const response = await api.get(`${API_URL}/analytics/salary-ranges`, { params });
+  const response = await api.get(`/api/analytics/salary-ranges`, { params });
   return response.data;
 };
 
@@ -73,7 +97,7 @@ export const getSalaryRanges = async (careerId = null, limit = 20) => {
  * @returns {Promise<Object[]>} SDG distribution data
  */
 export const getSDGDistribution = async () => {
-  const response = await api.get(`${API_URL}/analytics/sdg-distribution`);
+  const response = await api.get(`/api/analytics/sdg-distribution`);
   return response.data;
 };
 
@@ -83,7 +107,7 @@ export const getSDGDistribution = async () => {
  * @returns {Promise<Object>} Job market trends
  */
 export const getJobMarketTrends = async (period = 'month') => {
-  const response = await api.get(`${API_URL}/analytics/trends`, { params: { period } });
+  const response = await api.get(`/api/analytics/trends`, { params: { period } });
   return response.data;
 };
 
@@ -92,7 +116,7 @@ export const getJobMarketTrends = async (period = 'month') => {
  * @returns {Promise<Object>} User activity data
  */
 export const getUserActivity = async () => {
-  const response = await api.get(`${API_URL}/analytics/user-activity`);
+  const response = await api.get(`/api/analytics/user-activity`);
   return response.data;
 };
 
@@ -102,7 +126,7 @@ export const getUserActivity = async () => {
  * @returns {Promise<Object>} Application stats
  */
 export const getApplicationStats = async (params = {}) => {
-  const response = await api.get(`${API_URL}/analytics/applications`, { params });
+  const response = await api.get(`/api/analytics/applications`, { params });
   return response.data;
 };
 
@@ -112,7 +136,7 @@ export const getApplicationStats = async (params = {}) => {
  * @returns {Promise<Object>} Employer analytics
  */
 export const getEmployerAnalytics = async (employerId) => {
-  const response = await api.get(`${API_URL}/analytics/employer/${employerId}`);
+  const response = await api.get(`/api/analytics/employer/${employerId}`);
   return response.data;
 };
 

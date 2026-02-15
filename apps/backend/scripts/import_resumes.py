@@ -12,8 +12,8 @@ import os
 # Add parent directory to path for imports
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from models.user import User
-from utils.db import SessionLocal
+from apps.backend.models.user import User
+from apps.backend.db import SessionLocal
 
 # Initialize embedding model (same as your existing AI service)
 model = SentenceTransformer('all-mpnet-base-v2')

@@ -2,10 +2,12 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { usersAPI } from '../utils/api';
+import { useI18n } from '../contexts/I18nContext';
 
 const EmployerProfile = () => {
   
   const navigate = useNavigate();
+  const { t } = useI18n();
   
   // State management
   const [loading, setLoading] = useState(true);

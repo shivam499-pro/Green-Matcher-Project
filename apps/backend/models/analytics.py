@@ -3,7 +3,7 @@ Green Matchers - Analytics Model
 """
 from sqlalchemy import Column, Integer, String, DateTime, JSON
 from datetime import datetime
-from utils.db import Base
+from apps.backend.db.base import Base
 
 
 class Analytics(Base):

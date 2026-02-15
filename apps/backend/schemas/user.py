@@ -5,7 +5,7 @@ Pydantic schemas for request/response validation.
 from pydantic import BaseModel, EmailStr, Field
 from typing import Optional, List
 from datetime import datetime
-from models.user import UserRole
+from apps.backend.models.user import UserRole
 
 
 # Base User Schema
@@ -67,8 +67,7 @@ class UserResponse(BaseModel):
     is_verified: bool
     created_at: datetime
 
-    class Config:
-        from_attributes = True
+    model_config = {"from_attributes": True}
 
 
 # User Public Profile Schema (limited data for public endpoints)
@@ -82,8 +81,7 @@ class UserPublicProfile(BaseModel):
     company_description: Optional[str] = None
     company_website: Optional[str] = None
 
-    class Config:
-        from_attributes = True
+    model_config = {"from_attributes": True}
 
 
 # Token Response Schema

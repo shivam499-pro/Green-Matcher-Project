@@ -3,10 +3,11 @@
  * Displays career demand analytics.
  */
 import React from 'react';
+import { useI18n } from '../../contexts/I18nContext';
 
 
 const CareerDemandChart = ({ careerDemand }) => {
-  
+  const { t } = useI18n();
 
   if (!careerDemand || careerDemand.length === 0) {
     return (

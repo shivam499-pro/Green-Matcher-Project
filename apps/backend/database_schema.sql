@@ -42,3 +42,42 @@ CREATE TABLE IF NOT EXISTS user_skills (
 -- Add indexes for better performance
 CREATE INDEX idx_users_language ON users(preferred_language);
 CREATE INDEX idx_users_location ON users(location);
+
+-- Careers table (green career paths)
+CREATE TABLE IF NOT EXISTS careers (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    description TEXT NOT NULL,
+    required_skills JSON NOT NULL,
+    sdg_tags JSON NOT NULL DEFAULT '[]',
+    avg_salary_min INT,
+    avg_salary_max INT,
+    avg_salary INT,
+    growth_potential VARCHAR(50) DEFAULT 'Medium',
+    demand_score FLOAT DEFAULT 0.0,
+    embedding VARCHAR(5000),
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_careers_id (id),
+    INDEX idx_careers_title (title),
+    INDEX idx_careers_is_active (is_active)
+);
+
+-- Jobs table
+CREATE TABLE IF NOT EXISTS jobs (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    employer_id INT NOT NULL,
+    career_id INT,
+    title VARCHAR(255) NOT NULL,
+    description TEXT,
+    location VARCHAR(255),
+    salary_min INT,
+    salary_max INT,
+    job_type VARCHAR(50) DEFAULT 'full-time',
+    is_active BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (employer_id) REFERENCES users(id),
+    FOREIGN KEY (career_id) REFERENCES careers(id)
+);

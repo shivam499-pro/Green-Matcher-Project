@@ -9,10 +9,10 @@ from dataclasses import dataclass
 from datetime import datetime
 
 from sqlalchemy.orm import Session
-from sqlalchemy import and_, or_
+from sqlalchemy import and_, or_, desc
 
-from models.job import Job
-from models.career import Career
+from apps.backend.models.job import Job
+from apps.backend.models.career import Career
 from .embeddings import EmbeddingService
 
 logger = logging.getLogger(__name__)
@@ -24,6 +24,11 @@ class JobSearchResult:
     job: Job
     similarity_score: float
     career_title: Optional[str] = None
+    searched_at: datetime = None
+    
+    def __post_init__(self):
+        if self.searched_at is None:
+            self.searched_at = datetime.utcnow()
 
 
 class SearchService:
@@ -62,11 +67,20 @@ class SearchService:
             logger.warning("Empty search query provided")
             return []
         
+        # Log search timestamp
+        search_time = datetime.utcnow()
+        logger.info(f"Starting job search at {search_time.isoformat()}")
+        
         # Generate query embedding
         query_embedding = self.embedding_service.encode_text(query)
         
-        # Build base query
-        base_query = db.query(Job).filter(Job.is_active == True, Job.is_verified == True)
+        # Build base query with ordering by creation date
+        base_query = db.query(Job).filter(
+            and_(
+                Job.is_active == True,
+                Job.is_verified == True
+            )
+        ).order_by(desc(Job.created_at))
         
         # Apply filters
         if filters:
@@ -101,7 +115,8 @@ class SearchService:
                 results.append(JobSearchResult(
                     job=job,
                     similarity_score=similarity,
-                    career_title=career_title
+                    career_title=career_title,
+                    searched_at=search_time
                 ))
         
         # Sort by similarity (descending)
@@ -135,11 +150,20 @@ class SearchService:
             logger.warning("No skills provided for search")
             return []
         
+        # Log search timestamp
+        search_time = datetime.utcnow()
+        logger.info(f"Starting skill-based job search at {search_time.isoformat()}")
+        
         # Generate skill embedding
         skill_embedding = self.embedding_service.encode_user_skills(skills)
         
-        # Build base query
-        base_query = db.query(Job).filter(Job.is_active == True, Job.is_verified == True)
+        # Build base query with OR conditions for flexibility
+        base_query = db.query(Job).filter(
+            or_(
+                Job.is_active == True,
+                Job.is_verified == True
+            )
+        )
         
         # Apply filters
         if filters:
@@ -174,7 +198,8 @@ class SearchService:
                 results.append(JobSearchResult(
                     job=job,
                     similarity_score=similarity,
-                    career_title=career_title
+                    career_title=career_title,
+                    searched_at=search_time
                 ))
         
         # Sort by similarity (descending)
@@ -205,6 +230,10 @@ class SearchService:
         if not query or not query.strip():
             logger.warning("Empty search query provided")
             return []
+        
+        # Log search timestamp
+        search_time = datetime.utcnow()
+        logger.info(f"Starting career search at {search_time.isoformat()}")
         
         # Generate query embedding
         query_embedding = self.embedding_service.encode_text(query)
@@ -294,6 +323,9 @@ class SearchService:
         Returns:
             List[JobSearchResult]: List of similar jobs
         """
+        # Log search timestamp
+        search_time = datetime.utcnow()
+        
         # Get the reference job
         reference_job = db.query(Job).filter(Job.id == job_id).first()
         
@@ -304,7 +336,7 @@ class SearchService:
         # Parse reference job embedding
         reference_embedding = self.embedding_service.json_to_vector(reference_job.embedding)
         
-        # Get all other active jobs
+        # Get all other active jobs using AND conditions
         jobs = db.query(Job).filter(
             and_(
                 Job.id != job_id,
@@ -339,7 +371,8 @@ class SearchService:
                 results.append(JobSearchResult(
                     job=job,
                     similarity_score=similarity,
-                    career_title=career_title
+                    career_title=career_title,
+                    searched_at=search_time
                 ))
         
         # Sort by similarity (descending)
@@ -376,7 +409,8 @@ class SearchService:
                 "employer_id": job.employer_id,
                 "employer_name": job.employer.company_name if job.employer else None,
                 "sdg_tags": job.sdg_tags,
-                "created_at": job.created_at.isoformat() if job.created_at else None
+                "created_at": job.created_at.isoformat() if job.created_at else None,
+                "searched_at": result.searched_at.isoformat() if result.searched_at else None
             })
         
         return formatted

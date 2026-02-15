@@ -1,31 +1,33 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { recommendationsAPI } from '../utils/api';
-import { t } from '../utils/translations';
+import { useI18n } from '../contexts/I18nContext';
 
 const Recommendations = () => {
   
   const navigate = useNavigate();
+  const { t } = useI18n();
   const [loading, setLoading] = useState(true);
   const [recommendations, setRecommendations] = useState([]);
   const [error, setError] = useState(null);
+  const [activeTab, setActiveTab] = useState('careers'); // 'careers' or 'jobs'
 
-  useEffect(() => {
-    fetchRecommendations();
-  }, []);
-
-  const fetchRecommendations = async () => {
+  const fetchRecommendations = useCallback(async () => {
     try {
       const response = await recommendationsAPI.getCareerRecommendations();
       setRecommendations(response.data.recommendations || []);
     } catch (error) {
       console.error('Error fetching recommendations:', error);
-      setError('Failed to load recommendations');
+      setError(t('errors.recommendations_failed', 'Failed to load recommendations'));
     } finally {
       setLoading(false);
     }
-  };
+  }, [t]);
+
+  useEffect(() => {
+    fetchRecommendations();
+  }, [fetchRecommendations]);
 
   const getSDGColor = (sdgId) => {
     const colors = {
@@ -50,7 +52,7 @@ const Recommendations = () => {
       <div className="flex-1 flex items-center justify-center bg-gray-50">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">{t('common.loading') || 'Loading...'}</p>
+          <p className="mt-4 text-gray-600">{t('common.loading', 'Loading...')}</p>
         </div>
       </div>
     );
@@ -62,11 +64,35 @@ const Recommendations = () => {
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900">
-            {t('Career Recommendations')}
+            {t('recommendations.title', 'Career Recommendations')}
           </h1>
           <p className="mt-2 text-gray-600">
-            {t('Personalized career paths based on your skills and interests.')}
+            {t('recommendations.subtitle', 'Personalized career paths based on your skills and interests.')}
           </p>
+        </div>
+
+        {/* Tab Switcher */}
+        <div className="mb-6 flex space-x-4">
+          <button
+            onClick={() => setActiveTab('careers')}
+            className={`px-4 py-2 rounded-lg font-medium ${
+              activeTab === 'careers' 
+                ? 'bg-emerald-600 text-white' 
+                : 'bg-white text-gray-700 border border-gray-300'
+            }`}
+          >
+            {t('recommendations.careers_tab', 'Careers')}
+          </button>
+          <button
+            onClick={() => setActiveTab('jobs')}
+            className={`px-4 py-2 rounded-lg font-medium ${
+              activeTab === 'jobs' 
+                ? 'bg-emerald-600 text-white' 
+                : 'bg-white text-gray-700 border border-gray-300'
+            }`}
+          >
+            {t('recommendations.jobs_tab', 'Jobs')}
+          </button>
         </div>
 
         {/* Error */}

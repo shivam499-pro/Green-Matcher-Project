@@ -1,3 +1,4 @@
+
 """
 Green Matchers - Pydantic Schemas
 """
@@ -27,10 +28,9 @@ from .career import (
 )
 from .application import (
     ApplicationCreate,
-    ApplicationUpdate,
     ApplicationResponse,
-    ApplicationDetailResponse,
-    ApplicationQueryParams,
+    ApplicationForEmployerResponse,
+    ApplicationStatusUpdate,
 )
 from .analytics import (
     CareerDemand,
@@ -68,10 +68,9 @@ __all__ = [
     "CareerQueryParams",
     # Application schemas
     "ApplicationCreate",
-    "ApplicationUpdate",
     "ApplicationResponse",
-    "ApplicationDetailResponse",
-    "ApplicationQueryParams",
+    "ApplicationForEmployerResponse",
+    "ApplicationStatusUpdate",
     # Analytics schemas
     "CareerDemand",
     "SkillPopularity",

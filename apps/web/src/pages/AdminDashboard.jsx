@@ -1,12 +1,13 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { usersAPI, jobsAPI, careersAPI, analyticsAPI } from '../utils/api';
-import { t } from '../utils/translations';
+import { useI18n } from '../contexts/I18nContext';
 
 const AdminDashboard = () => {
   
   const navigate = useNavigate();
+  const { t } = useI18n();
   
   // State management
   const [loading, setLoading] = useState(true);
@@ -16,14 +17,15 @@ const AdminDashboard = () => {
   const [careers, setCareers] = useState([]);
   const [analytics, setAnalytics] = useState(null);
   const [error, setError] = useState(null);
-
-  // Fetch data when tab changes
-  useEffect(() => {
-    fetchData();
-  }, [activeTab]);
+  const [stats, setStats] = useState({
+    totalUsers: 0,
+    totalJobs: 0,
+    totalCareers: 0,
+    verifiedJobs: 0,
+  });
 
   // Fetch data based on active tab
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     setLoading(true);
     setError(null);
 
@@ -31,7 +33,16 @@ const AdminDashboard = () => {
       switch (activeTab) {
         case 'overview':
           const analyticsResponse = await analyticsAPI.getOverview();
-          setAnalytics(analyticsResponse?.data || null);
+          const analyticsData = analyticsResponse?.data || null;
+          setAnalytics(analyticsData);
+          if (analyticsData) {
+            setStats({
+              totalUsers: analyticsData.total_users || 0,
+              totalJobs: analyticsData.total_jobs || 0,
+              totalCareers: analyticsData.total_careers || 0,
+              verifiedJobs: analyticsData.verified_jobs || 0,
+            });
+          }
           break;
           
         case 'users':
@@ -41,12 +52,14 @@ const AdminDashboard = () => {
           
         case 'jobs':
           const jobsResponse = await jobsAPI.listJobs();
-          setJobs(jobsResponse?.data?.items || jobsResponse?.data || []);
+          const jobsData = jobsResponse?.data?.items || jobsResponse?.data || [];
+          setJobs(jobsData);
           break;
           
         case 'careers':
           const careersResponse = await careersAPI.listCareers();
-          setCareers(careersResponse?.data?.items || careersResponse?.data || []);
+          const careersData = careersResponse?.data?.items || careersResponse?.data || [];
+          setCareers(careersData);
           break;
           
         default:
@@ -54,11 +67,16 @@ const AdminDashboard = () => {
       }
     } catch (err) {
       console.error('Error fetching admin data:', err);
-      setError(t('admin.fetchError') || 'Failed to load data. Please try again.');
+      setError(t('admin.fetch_error', 'Failed to load data. Please try again.'));
     } finally {
       setLoading(false);
     }
-  };
+  }, [activeTab, t]);
+
+  // Fetch data when tab changes
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
 
   // Verify a job
   const handleVerifyJob = async (jobId) => {
@@ -67,14 +85,14 @@ const AdminDashboard = () => {
       await fetchData();
     } catch (err) {
       console.error('Error verifying job:', err);
-      setError(t('admin.verifyJobError') || 'Failed to verify job. Please try again.');
+      setError(t('admin.verify_job_error', 'Failed to verify job. Please try again.'));
     }
   };
 
   // Delete a job with confirmation
   const handleDeleteJob = async (jobId) => {
     const confirmed = window.confirm(
-      t('admin.confirmDeleteJob') || 'Are you sure you want to delete this job? This action cannot be undone.'
+      t('admin.confirm_delete_job', 'Are you sure you want to delete this job? This action cannot be undone.')
     );
     
     if (!confirmed) return;

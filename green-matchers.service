@@ -1,0 +1,60 @@
+# Green Matchers - Systemd Service File
+# Place this file in: /etc/systemd/system/green-matchers.service
+# 
+# Installation:
+# 1. sudo cp green-matchers.service /etc/systemd/system/
+# 2. sudo systemctl daemon-reload
+# 3. sudo systemctl enable green-matchers
+# 4. sudo systemctl start green-matchers
+#
+# Management:
+# - Start: sudo systemctl start green-matchers
+# - Stop: sudo systemctl stop green-matchers
+# - Restart: sudo systemctl restart green-matchers
+# - Status: sudo systemctl status green-matchers
+# - Logs: sudo journalctl -u green-matchers -f
+
+[Unit]
+Description=Green Matchers - AI-Native Green Jobs Platform
+After=network.target mariadb.service
+Wants=mariadb.service
+
+[Service]
+Type=simple
+User=www-data
+Group=www-data
+WorkingDirectory=/var/www/green-matchers/backend
+Environment="PATH=/var/www/green-matchers/backend/venv/bin"
+EnvironmentFile=/var/www/green-matchers/backend/.env.production
+
+# Start command
+ExecStart=/var/www/green-matchers/backend/venv/bin/uvicorn main:app \
+    --host 127.0.0.1 \
+    --port 8000 \
+    --workers 4 \
+    --log-level info \
+    --access-log \
+    --proxy-headers
+
+# Restart policy
+Restart=always
+RestartSec=10
+
+# Security settings
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/www/green-matchers/backend/logs
+
+# Resource limits
+LimitNOFILE=65535
+LimitNPROC=4096
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=green-matchers
+
+[Install]
+WantedBy=multi-user.target
